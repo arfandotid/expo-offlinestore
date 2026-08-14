@@ -98,6 +98,21 @@ export default function RootLayout() {
             gestureEnabled: false,
           }}
         />
+        <Stack.Screen
+          name="history/[id]"
+          options={{
+            headerShown: true,
+            title: 'Detail Transaksi',
+            headerBackTitle: 'Riwayat',
+            headerStyle: { backgroundColor: THEME.colors.surface },
+            headerTitleStyle: {
+              fontWeight: '700',
+              fontSize: 17,
+              color: THEME.colors.text,
+            },
+            headerTintColor: THEME.colors.primary,
+          }}
+        />
       </Stack>
     </SafeAreaProvider>
   );

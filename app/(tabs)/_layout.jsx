@@ -56,6 +56,16 @@ export default function TabsLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="history"
+        options={{
+          title: 'Riwayat Transaksi',
+          tabBarLabel: 'Riwayat',
+          tabBarIcon: ({ focused }) => (
+            <Text style={styles.tabIcon}>{focused ? '🧾' : '📜'}</Text>
+          ),
+        }}
+      />
     </Tabs>
   );
 }

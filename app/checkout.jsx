@@ -15,6 +15,8 @@ import { formatRupiah } from '../src/components/ProductCard';
 import CashPayment from '../src/components/CashPayment';
 import QrisPayment from '../src/components/QrisPayment';
 
+import { transactionRepository } from '../src/db/transactionRepository';
+
 export default function CheckoutScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -26,6 +28,7 @@ export default function CheckoutScreen() {
   const [paymentMethod, setPaymentMethod] = useState('TUNAI'); // 'TUNAI' | 'QRIS'
   const [cashAmount, setCashAmount] = useState('');
   const [proofPhotoUri, setProofPhotoUri] = useState(null);
+  const [saving, setSaving] = useState(false);
 
   // Validasi apakah transaksi dapat diselesaikan
   const numericCash = parseFloat(cashAmount.toString().replace(/[^0-9]/g, '')) || 0;
@@ -34,7 +37,7 @@ export default function CheckoutScreen() {
 
   const canComplete = paymentMethod === 'TUNAI' ? isCashValid : isQrisValid;
 
-  // Eksekusi penyelesaian transaksi
+  // Eksekusi penyelesaian transaksi & simpan ke SQLite
   const handleCompleteTransaction = () => {
     if (!canComplete) {
       if (paymentMethod === 'TUNAI') {
@@ -45,26 +48,47 @@ export default function CheckoutScreen() {
       return;
     }
 
-    const changeAmount = paymentMethod === 'TUNAI' ? numericCash - totalPrice : 0;
+    setSaving(true);
+    try {
+      const changeAmount = paymentMethod === 'TUNAI' ? numericCash - totalPrice : 0;
+      const timestamp = new Date().toISOString();
 
-    const transactionData = {
-      items: cartItems,
-      totalPrice,
-      totalItems,
-      paymentMethod,
-      cashReceived: paymentMethod === 'TUNAI' ? numericCash : totalPrice,
-      changeAmount,
-      proofPhotoUri: paymentMethod === 'QRIS' ? proofPhotoUri : null,
-      timestamp: new Date().toISOString(),
-    };
+      // Simpan permanen ke tabel transactions & transaction_items di SQLite
+      const transactionId = transactionRepository.saveTransaction({
+        tanggal: timestamp,
+        total_tagihan: totalPrice,
+        metode_bayar: paymentMethod,
+        nominal_bayar: paymentMethod === 'TUNAI' ? numericCash : totalPrice,
+        kembalian: changeAmount,
+        bukti_qris: paymentMethod === 'QRIS' ? proofPhotoUri : null,
+        items: cartItems,
+      });
 
-    // Navigasi ke Layar Sukses (Fase 5)
-    router.replace({
-      pathname: '/success',
-      params: {
-        transactionJson: JSON.stringify(transactionData),
-      },
-    });
+      const transactionData = {
+        id: transactionId,
+        items: cartItems,
+        totalPrice,
+        totalItems,
+        paymentMethod,
+        cashReceived: paymentMethod === 'TUNAI' ? numericCash : totalPrice,
+        changeAmount,
+        proofPhotoUri: paymentMethod === 'QRIS' ? proofPhotoUri : null,
+        timestamp,
+      };
+
+      // Navigasi ke Layar Sukses (Fase 5)
+      router.replace({
+        pathname: '/success',
+        params: {
+          transactionJson: JSON.stringify(transactionData),
+        },
+      });
+    } catch (error) {
+      console.error('Error saving transaction to database:', error);
+      Alert.alert('Error', 'Gagal menyimpan data transaksi ke database.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
