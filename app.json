@@ -11,12 +11,18 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.pos.offlinestore",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -37,6 +43,13 @@
         }
       ],
       "expo-sharing"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "2e4ad398-0bb4-4033-97bc-4c94c94201d4"
+      }
+    },
+    "owner": "arfandotid"
   }
 }
