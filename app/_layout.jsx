@@ -91,6 +91,13 @@ export default function RootLayout() {
             headerTintColor: THEME.colors.primary,
           }}
         />
+        <Stack.Screen
+          name="success"
+          options={{
+            headerShown: false,
+            gestureEnabled: false,
+          }}
+        />
       </Stack>
     </SafeAreaProvider>
   );
