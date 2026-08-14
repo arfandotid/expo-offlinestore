@@ -1,20 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { THEME } from '../src/constants/theme';
 import { formatRupiah } from '../src/components/ProductCard';
+import { shareReceiptPdf } from '../src/utils/receiptGenerator';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
 
+  const [sharing, setSharing] = useState(false);
   const transaction = params?.transactionJson ? JSON.parse(params.transactionJson) : null;
+
+  // Bagikan Struk ke WhatsApp / Media lain via PDF
+  const handleShareReceipt = async () => {
+    if (!transaction) return;
+    setSharing(true);
+    try {
+      await shareReceiptPdf(transaction);
+    } catch (error) {
+      console.error('Error sharing receipt PDF:', error);
+      Alert.alert('Gagal Membagikan', error.message || 'Terjadi kesalahan saat membagikan struk PDF.');
+    } finally {
+      setSharing(false);
+    }
+  };
+
+  // Selesaikan alur transaksi dan kembali ke kasir baru
+  const handleFinishTransaction = () => {
+    router.replace('/');
+  };
 
   return (
     <View style={styles.container}>
@@ -46,6 +69,11 @@ export default function SuccessScreen() {
               <Text style={styles.summaryValueBold}>{formatRupiah(transaction.totalPrice)}</Text>
             </View>
 
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Jumlah Item</Text>
+              <Text style={styles.summaryValue}>{transaction.totalItems} barang</Text>
+            </View>
+
             {transaction.paymentMethod === 'TUNAI' && (
               <>
                 <View style={styles.summaryRow}>
@@ -67,20 +95,35 @@ export default function SuccessScreen() {
           </View>
         )}
 
-        {/* Placeholder Button Fase 5 */}
+        {/* Action Buttons: Bagikan Struk & Selesai */}
         <View style={styles.actionSection}>
-          <View style={styles.fase5Placeholder}>
-            <Text style={styles.fase5Text}>
-              📄 Fitur Ekspor PDF & Bagikan WhatsApp akan diaktifkan pada Fase 5.
-            </Text>
-          </View>
-
+          {/* Tombol Bagikan Struk PDF / WhatsApp */}
           <TouchableOpacity
             activeOpacity={0.85}
-            onPress={() => router.replace('/')}
+            onPress={handleShareReceipt}
+            disabled={sharing}
+            style={styles.shareBtn}
+          >
+            {sharing ? (
+              <View style={styles.btnLoadingRow}>
+                <ActivityIndicator size="small" color="#16a34a" />
+                <Text style={styles.shareBtnTextLoading}>Menyiapkan PDF...</Text>
+              </View>
+            ) : (
+              <View style={styles.btnContentRow}>
+                <Text style={styles.shareBtnIcon}>📄</Text>
+                <Text style={styles.shareBtnText}>Bagikan Struk (PDF / WhatsApp)</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          {/* Tombol Selesai (Transaksi Baru) */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleFinishTransaction}
             style={styles.doneBtn}
           >
-            <Text style={styles.doneBtnText}>Selesai (Transaksi Baru)</Text>
+            <Text style={styles.doneBtnText}>✓ Selesai (Transaksi Baru)</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -206,19 +249,39 @@ const styles = StyleSheet.create({
     width: '100%',
     gap: 12,
   },
-  fase5Placeholder: {
-    backgroundColor: THEME.colors.surface,
-    padding: THEME.spacing.md,
+  shareBtn: {
+    backgroundColor: THEME.colors.primarySoft,
+    borderWidth: 1.5,
+    borderColor: THEME.colors.primary,
+    paddingVertical: 15,
     borderRadius: THEME.borderRadius.lg,
-    borderWidth: 1,
-    borderColor: THEME.colors.border,
-    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  fase5Text: {
-    fontSize: 12,
-    color: THEME.colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 16,
+  btnContentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnLoadingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  shareBtnIcon: {
+    fontSize: 18,
+    marginRight: 8,
+  },
+  shareBtnText: {
+    color: THEME.colors.primaryDark,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  shareBtnTextLoading: {
+    color: THEME.colors.primaryDark,
+    fontSize: 14,
+    fontWeight: '700',
+    marginLeft: 8,
   },
   doneBtn: {
     backgroundColor: THEME.colors.primary,
@@ -231,6 +294,6 @@ const styles = StyleSheet.create({
   doneBtnText: {
     color: '#ffffff',
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

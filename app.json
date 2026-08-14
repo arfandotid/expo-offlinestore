@@ -35,7 +35,8 @@
         {
           "photosPermission": "Aplikasi membutuhkan izin galeri untuk memilih foto produk lokal."
         }
-      ]
+      ],
+      "expo-sharing"
     ]
   }
 }
