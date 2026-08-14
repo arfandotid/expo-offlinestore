@@ -1,6 +1,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { formatRupiah } from '../components/ProductCard';
+import { formatTransactionNo } from './transactionNumber';
 
 /**
  * Format tanggal dan waktu untuk struk
@@ -30,7 +31,7 @@ export function generateReceiptHtml(transaction) {
     timestamp = new Date().toISOString(),
   } = transaction;
 
-  const receiptNo = 'TRX-' + new Date(timestamp).getTime().toString().slice(-8);
+  const receiptNo = formatTransactionNo(transaction.id, timestamp);
 
   const itemsHtml = items
     .map((item) => {

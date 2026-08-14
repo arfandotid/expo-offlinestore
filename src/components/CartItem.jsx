@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { Package, Minus, Plus } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
 export default function CartItem({ item, onUpdateQty, onRemove }) {
@@ -34,7 +35,7 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
         {product.foto ? (
           <Image source={{ uri: product.foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Text style={styles.placeholderIcon}>📦</Text>
+          <Package size={20} color={THEME.colors.textMuted} />
         )}
       </View>
 
@@ -58,7 +59,7 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
           onPress={() => onUpdateQty(product.id, qty - 1)}
           style={styles.stepBtn}
         >
-          <Text style={styles.stepBtnText}>-</Text>
+          <Minus size={16} color={THEME.colors.textSecondary} strokeWidth={2.5} />
         </TouchableOpacity>
 
         {isEditingQty ? (
@@ -90,7 +91,7 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
           onPress={() => onUpdateQty(product.id, qty + 1)}
           style={[styles.stepBtn, styles.stepBtnAdd]}
         >
-          <Text style={[styles.stepBtnText, styles.stepBtnAddText]}>+</Text>
+          <Plus size={16} color={THEME.colors.primaryDark} strokeWidth={2.5} />
         </TouchableOpacity>
       </View>
     </View>
@@ -123,9 +124,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-  },
-  placeholderIcon: {
-    fontSize: 20,
   },
   infoContainer: {
     flex: 1,
@@ -164,16 +162,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: THEME.colors.surface,
   },
-  stepBtnText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: THEME.colors.textSecondary,
-  },
   stepBtnAdd: {
     backgroundColor: THEME.colors.primarySoft,
-  },
-  stepBtnAddText: {
-    color: THEME.colors.primaryDark,
   },
   qtyDisplay: {
     minWidth: 32,

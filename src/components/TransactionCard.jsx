@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ArrowRight } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 import { formatRupiah } from './ProductCard';
+import { formatTransactionNo } from '../utils/transactionNumber';
 
 /**
  * Format tanggal dan waktu singkat
@@ -31,7 +33,7 @@ export default function TransactionCard({ transaction, onPress }) {
     >
       <View style={styles.headerRow}>
         <View style={styles.idGroup}>
-          <Text style={styles.receiptNo}>TRX-{id.toString().padStart(5, '0')}</Text>
+          <Text style={styles.receiptNo}>{formatTransactionNo(id, tanggal)}</Text>
           <Text style={styles.dateText}>{formatSimpleDate(tanggal)}</Text>
         </View>
 
@@ -63,7 +65,8 @@ export default function TransactionCard({ transaction, onPress }) {
         </View>
 
         <View style={styles.arrowButton}>
-          <Text style={styles.arrowText}>Detail →</Text>
+          <Text style={styles.arrowText}>Detail</Text>
+          <ArrowRight size={12} color={THEME.colors.primaryDark} />
         </View>
       </View>
     </TouchableOpacity>
@@ -145,6 +148,7 @@ const styles = StyleSheet.create({
   arrowButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
     backgroundColor: THEME.colors.background,
     paddingHorizontal: 12,
     paddingVertical: 6,

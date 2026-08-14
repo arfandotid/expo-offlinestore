@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text, StyleSheet, Platform } from 'react-native';
+import { Platform } from 'react-native';
+import { ShoppingCart, Package, Receipt } from 'lucide-react-native';
 import { THEME } from '../../src/constants/theme';
 
 export default function TabsLayout() {
@@ -41,8 +42,8 @@ export default function TabsLayout() {
         options={{
           title: 'Penjualan',
           tabBarLabel: 'Penjualan',
-          tabBarIcon: ({ focused }) => (
-            <Text style={styles.tabIcon}>{focused ? '🛒' : '🛍️'}</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <ShoppingCart size={22} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
@@ -51,8 +52,8 @@ export default function TabsLayout() {
         options={{
           title: 'Kelola Barang',
           tabBarLabel: 'Kelola Barang',
-          tabBarIcon: ({ focused }) => (
-            <Text style={styles.tabIcon}>{focused ? '📦' : '📋'}</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Package size={22} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
@@ -61,17 +62,11 @@ export default function TabsLayout() {
         options={{
           title: 'Riwayat Transaksi',
           tabBarLabel: 'Riwayat',
-          tabBarIcon: ({ focused }) => (
-            <Text style={styles.tabIcon}>{focused ? '🧾' : '📜'}</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Receipt size={22} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  tabIcon: {
-    fontSize: 20,
-  },
-});

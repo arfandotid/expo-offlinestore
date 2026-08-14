@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Camera, X, Flashlight, Zap } from 'lucide-react-native';
 import { THEME } from '../../src/constants/theme';
 
 export default function BarcodeScannerScreen() {
@@ -20,7 +21,7 @@ export default function BarcodeScannerScreen() {
   if (!permission.granted) {
     return (
       <View style={styles.permissionContainer}>
-        <Text style={styles.permissionIcon}>📷</Text>
+        <Camera size={48} color="#ffffff" style={styles.permissionIcon} />
         <Text style={styles.permissionTitle}>Izin Kamera Diperlukan</Text>
         <Text style={styles.permissionSubtitle}>
           Aplikasi membutuhkan akses kamera HP untuk memindai barcode produk secara otomatis.
@@ -91,7 +92,7 @@ export default function BarcodeScannerScreen() {
             activeOpacity={0.7}
             style={styles.circleBtn}
           >
-            <Text style={styles.closeIcon}>✕</Text>
+            <X size={18} color="#ffffff" />
           </TouchableOpacity>
 
           <Text style={styles.topBarTitle}>Scan Barcode Produk</Text>
@@ -101,7 +102,11 @@ export default function BarcodeScannerScreen() {
             activeOpacity={0.7}
             style={[styles.circleBtn, torch && styles.circleBtnActive]}
           >
-            <Text style={styles.torchIcon}>{torch ? '🔦' : '⚡'}</Text>
+            {torch ? (
+              <Flashlight size={18} color="#ffffff" />
+            ) : (
+              <Zap size={18} color="#ffffff" />
+            )}
           </TouchableOpacity>
         </View>
 
@@ -148,7 +153,6 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.xl,
   },
   permissionIcon: {
-    fontSize: 48,
     marginBottom: THEME.spacing.md,
   },
   permissionTitle: {
@@ -210,18 +214,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fbbf24',
     borderColor: '#f59e0b',
   },
-  closeIcon: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
   topBarTitle: {
     color: '#ffffff',
     fontSize: 16,
     fontWeight: '700',
-  },
-  torchIcon: {
-    fontSize: 16,
   },
   viewfinderCenter: {
     alignItems: 'center',

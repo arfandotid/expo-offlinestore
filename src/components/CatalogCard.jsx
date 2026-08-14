@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import { Package } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 import { formatRupiah } from './ProductCard';
 
@@ -17,7 +18,7 @@ export default function CatalogCard({ product, onAddToCart, cartQty = 0 }) {
         {foto ? (
           <Image source={{ uri: foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Text style={styles.placeholderIcon}>📦</Text>
+          <Package size={36} color={THEME.colors.textMuted} />
         )}
 
         {/* Badge jika sudah di keranjang */}
@@ -68,9 +69,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-  },
-  placeholderIcon: {
-    fontSize: 36,
   },
   qtyBadge: {
     position: 'absolute',

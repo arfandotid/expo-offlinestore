@@ -10,6 +10,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Banknote, Smartphone, Check } from 'lucide-react-native';
 import { THEME } from '../src/constants/theme';
 import { formatRupiah } from '../src/components/ProductCard';
 import CashPayment from '../src/components/CashPayment';
@@ -119,7 +120,10 @@ export default function CheckoutScreen() {
               paymentMethod === 'TUNAI' && styles.tabBtnActive,
             ]}
           >
-            <Text style={styles.tabIcon}>💵</Text>
+            <Banknote
+              size={16}
+              color={paymentMethod === 'TUNAI' ? '#ffffff' : THEME.colors.textSecondary}
+            />
             <Text
               style={[
                 styles.tabText,
@@ -138,7 +142,10 @@ export default function CheckoutScreen() {
               paymentMethod === 'QRIS' && styles.tabBtnActive,
             ]}
           >
-            <Text style={styles.tabIcon}>📱</Text>
+            <Smartphone
+              size={16}
+              color={paymentMethod === 'QRIS' ? '#ffffff' : THEME.colors.textSecondary}
+            />
             <Text
               style={[
                 styles.tabText,
@@ -175,14 +182,20 @@ export default function CheckoutScreen() {
               !canComplete && styles.completeBtnDisabled,
             ]}
           >
-            <Text
-              style={[
-                styles.completeBtnText,
-                !canComplete && styles.completeBtnTextDisabled,
-              ]}
-            >
-              ✓ Selesaikan Transaksi
-            </Text>
+            <View style={styles.completeBtnContent}>
+              <Check
+                size={16}
+                color={canComplete ? '#ffffff' : THEME.colors.textMuted}
+              />
+              <Text
+                style={[
+                  styles.completeBtnText,
+                  !canComplete && styles.completeBtnTextDisabled,
+                ]}
+              >
+                Selesaikan Transaksi
+              </Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -243,15 +256,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: 6,
     paddingVertical: 12,
     borderRadius: THEME.borderRadius.md,
   },
   tabBtnActive: {
     backgroundColor: THEME.colors.primary,
-  },
-  tabIcon: {
-    fontSize: 16,
-    marginRight: 6,
   },
   tabText: {
     fontSize: 14,
@@ -276,6 +286,11 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.border,
     shadowOpacity: 0,
     elevation: 0,
+  },
+  completeBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   completeBtnText: {
     color: '#ffffff',

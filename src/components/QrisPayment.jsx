@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import { Smartphone, Camera, CircleCheck } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 import { formatRupiah } from './ProductCard';
 
@@ -58,7 +59,7 @@ export default function QrisPayment({
           <View style={styles.qrCornerTopRight} />
           <View style={styles.qrCornerBottomLeft} />
           
-          <Text style={styles.qrIcon}>📱</Text>
+          <Smartphone size={44} color={THEME.colors.text} style={styles.qrIcon} />
           <Text style={styles.qrHint}>NMID: ID102003847592</Text>
           <Text style={styles.qrAmountBadge}>{formatRupiah(totalPrice)}</Text>
         </View>
@@ -74,7 +75,8 @@ export default function QrisPayment({
           <Text style={styles.proofLabel}>Foto Bukti Transfer Pelanggan</Text>
           {proofPhotoUri ? (
             <View style={styles.verifiedBadge}>
-              <Text style={styles.verifiedText}>✓ Bukti Terlampir</Text>
+              <CircleCheck size={12} color={THEME.colors.primaryDark} />
+              <Text style={styles.verifiedText}>Bukti Terlampir</Text>
             </View>
           ) : (
             <Text style={styles.requiredText}>* Wajib ada foto</Text>
@@ -94,7 +96,8 @@ export default function QrisPayment({
                 onPress={handleTakeProofPhoto}
                 style={styles.retakeBtn}
               >
-                <Text style={styles.retakeBtnText}>📷 Foto Ulang</Text>
+                <Camera size={12} color={THEME.colors.primaryDark} />
+                <Text style={styles.retakeBtnText}>Foto Ulang</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 activeOpacity={0.8}
@@ -111,7 +114,7 @@ export default function QrisPayment({
             onPress={handleTakeProofPhoto}
             style={styles.takePhotoBtn}
           >
-            <Text style={styles.cameraIcon}>📸</Text>
+            <Camera size={32} color={THEME.colors.primary} style={styles.cameraIcon} />
             <Text style={styles.takePhotoText}>Ambil Foto Bukti Transfer</Text>
             <Text style={styles.takePhotoHint}>
               Potret layar HP pelanggan setelah transfer sukses
@@ -199,7 +202,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   qrIcon: {
-    fontSize: 44,
     marginBottom: 4,
   },
   qrHint: {
@@ -246,6 +248,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   verifiedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: THEME.colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -273,7 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.background,
   },
   cameraIcon: {
-    fontSize: 32,
     marginBottom: 6,
   },
   takePhotoText: {
@@ -306,6 +310,9 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.surface,
   },
   retakeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: THEME.colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 8,

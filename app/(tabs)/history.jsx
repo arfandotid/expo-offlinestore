@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { ScrollText } from 'lucide-react-native';
 import { transactionRepository } from '../../src/db/transactionRepository';
 import TransactionCard from '../../src/components/TransactionCard';
 import EmptyState from '../../src/components/EmptyState';
@@ -96,7 +97,7 @@ export default function HistoryScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
-              icon="📜"
+              icon={<ScrollText size={36} color={THEME.colors.primary} />}
               title="Belum Ada Transaksi"
               subtitle="Semua transaksi penjualan kasir yang telah diselesaikan akan tercatat rapi di sini."
               actionText="Mulai Penjualan Baru"

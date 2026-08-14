@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import { ImagePlus, Barcode, Trash2 } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import { THEME } from '../../src/constants/theme';
 
@@ -140,7 +141,7 @@ export default function ProductFormScreen() {
               <Image source={{ uri: foto }} style={styles.previewImage} resizeMode="cover" />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <Text style={styles.cameraIcon}>📷</Text>
+                <ImagePlus size={28} color={THEME.colors.primary} style={styles.cameraIcon} />
                 <Text style={styles.photoLabel}>Pilih Foto</Text>
                 <Text style={styles.photoSubLabel}>Dari Galeri</Text>
               </View>
@@ -148,6 +149,7 @@ export default function ProductFormScreen() {
           </TouchableOpacity>
           {foto ? (
             <TouchableOpacity onPress={() => setFoto('')} style={styles.deletePhotoBtn}>
+              <Trash2 size={12} color={THEME.colors.danger} />
               <Text style={styles.deletePhotoText}>Hapus Foto</Text>
             </TouchableOpacity>
           ) : null}
@@ -230,7 +232,8 @@ export default function ProductFormScreen() {
               activeOpacity={0.8}
               style={styles.scanButton}
             >
-              <Text style={styles.scanButtonText}>📷 Scan</Text>
+              <Barcode size={14} color={THEME.colors.primaryDark} />
+              <Text style={styles.scanButtonText}>Scan</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -296,7 +299,6 @@ const styles = StyleSheet.create({
     padding: THEME.spacing.sm,
   },
   cameraIcon: {
-    fontSize: 28,
     marginBottom: 4,
   },
   photoLabel: {
@@ -310,6 +312,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   deletePhotoBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     marginTop: THEME.spacing.sm,
   },
   deletePhotoText: {
@@ -403,6 +408,9 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   scanButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     backgroundColor: THEME.colors.primarySoft,
     borderWidth: 1,
     borderColor: THEME.colors.primaryLight,
@@ -410,7 +418,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     marginLeft: 8,
-    alignItems: 'center',
     justifyContent: 'center',
   },
   scanButtonText: {

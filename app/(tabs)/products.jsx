@@ -11,6 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useRouter, useFocusEffect } from 'expo-router';
+import { Search, X, Plus } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import ProductCard from '../../src/components/ProductCard';
 import EmptyState from '../../src/components/EmptyState';
@@ -96,7 +97,7 @@ export default function ProductsScreen() {
       {/* Search Header Bar */}
       <View style={styles.searchHeader}>
         <View style={styles.searchInputWrapper}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Search size={16} color={THEME.colors.textMuted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Cari nama barang atau barcode..."
@@ -107,7 +108,7 @@ export default function ProductsScreen() {
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-              <Text style={styles.clearBtnText}>✕</Text>
+              <X size={14} color={THEME.colors.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -151,7 +152,9 @@ export default function ProductsScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
-              icon={searchQuery ? '🔍' : '📦'}
+              icon={
+                <Search size={36} color={THEME.colors.primary} />
+              }
               title={searchQuery ? 'Produk Tidak Ditemukan' : 'Belum Ada Barang'}
               subtitle={
                 searchQuery
@@ -178,8 +181,8 @@ export default function ProductsScreen() {
           activeOpacity={0.85}
           style={styles.fab}
         >
-          <Text style={styles.fabPlus}>+</Text>
           <Text style={styles.fabText}>Tambah Barang</Text>
+          <Plus size={20} color="#ffffff" style={styles.fabPlus} />
         </TouchableOpacity>
       </View>
     </View>
@@ -211,7 +214,6 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.border,
   },
   searchIcon: {
-    fontSize: 16,
     marginRight: THEME.spacing.sm,
   },
   searchInput: {
@@ -222,11 +224,6 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     padding: 4,
-  },
-  clearBtnText: {
-    color: THEME.colors.textMuted,
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   counterRow: {
     flexDirection: 'row',
@@ -284,11 +281,7 @@ const styles = StyleSheet.create({
     ...THEME.shadow.fab,
   },
   fabPlus: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginRight: 8,
-    lineHeight: 22,
+    marginLeft: 8,
   },
   fabText: {
     color: '#ffffff',

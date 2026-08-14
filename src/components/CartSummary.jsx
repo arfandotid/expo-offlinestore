@@ -7,6 +7,7 @@ import {
   Platform,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
 export default function CartSummary({
@@ -33,9 +34,16 @@ export default function CartSummary({
             <View style={styles.countBadge}>
               <Text style={styles.countBadgeText}>{totalItems} Item</Text>
             </View>
-            <Text style={styles.expandLabel}>
-              {isExpanded ? 'Tutup Detail ▼' : 'Lihat Keranjang ▲'}
-            </Text>
+            <View style={styles.expandRow}>
+              <Text style={styles.expandLabel}>
+                {isExpanded ? 'Tutup Detail' : 'Lihat Keranjang'}
+              </Text>
+              {isExpanded ? (
+                <ChevronDown size={12} color={THEME.colors.textSecondary} />
+              ) : (
+                <ChevronUp size={12} color={THEME.colors.textSecondary} />
+              )}
+            </View>
           </View>
           <Text style={styles.totalPriceText}>{formatRupiah(totalPrice)}</Text>
         </TouchableOpacity>
@@ -47,7 +55,7 @@ export default function CartSummary({
           style={styles.checkoutBtn}
         >
           <Text style={styles.checkoutBtnText}>Checkout</Text>
-          <Text style={styles.checkoutArrow}>→</Text>
+          <ArrowRight size={16} color="#ffffff" />
         </TouchableOpacity>
       </View>
     </View>
@@ -90,6 +98,11 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '700',
   },
+  expandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
   expandLabel: {
     color: THEME.colors.textSecondary,
     fontSize: 11,
@@ -114,10 +127,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     marginRight: 6,
-  },
-  checkoutArrow: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });

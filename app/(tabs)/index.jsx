@@ -12,6 +12,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { Search, Barcode, X, ShoppingCart, ArrowRight } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import CatalogCard from '../../src/components/CatalogCard';
 import CartItem from '../../src/components/CartItem';
@@ -171,7 +172,7 @@ export default function SalesScreen() {
       <View style={styles.headerArea}>
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrapper}>
-            <Text style={styles.searchIcon}>🔍</Text>
+            <Search size={15} color={THEME.colors.textMuted} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Cari menu / nama barang..."
@@ -182,7 +183,7 @@ export default function SalesScreen() {
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-                <Text style={styles.clearBtnText}>✕</Text>
+                <X size={14} color={THEME.colors.textMuted} />
               </TouchableOpacity>
             )}
           </View>
@@ -193,7 +194,7 @@ export default function SalesScreen() {
             onPress={openScanner}
             style={styles.scanBtn}
           >
-            <Text style={styles.scanBtnIcon}>📷</Text>
+            <Barcode size={14} color={THEME.colors.primaryDark} style={styles.scanBtnIcon} />
             <Text style={styles.scanBtnText}>Scan</Text>
           </TouchableOpacity>
         </View>
@@ -221,7 +222,9 @@ export default function SalesScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
-              icon={searchQuery ? '🔍' : '📦'}
+              icon={
+                <Search size={36} color={THEME.colors.primary} />
+              }
               title={searchQuery ? 'Produk Tidak Ditemukan' : 'Katalog Masih Kosong'}
               subtitle={
                 searchQuery
@@ -281,7 +284,7 @@ export default function SalesScreen() {
                   activeOpacity={0.7}
                   style={styles.closeModalBtn}
                 >
-                  <Text style={styles.closeModalText}>✕</Text>
+                  <X size={14} color={THEME.colors.textSecondary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -300,7 +303,7 @@ export default function SalesScreen() {
               )}
               ListEmptyComponent={
                 <View style={styles.emptyCartBox}>
-                  <Text style={styles.emptyCartIcon}>🛒</Text>
+                  <ShoppingCart size={48} color={THEME.colors.textMuted} />
                   <Text style={styles.emptyCartText}>Keranjang belanja Anda kosong</Text>
                 </View>
               }
@@ -320,7 +323,7 @@ export default function SalesScreen() {
                   style={styles.modalCheckoutBtn}
                 >
                   <Text style={styles.modalCheckoutText}>Lanjut ke Pembayaran</Text>
-                  <Text style={styles.modalCheckoutArrow}>→</Text>
+                  <ArrowRight size={16} color="#ffffff" />
                 </TouchableOpacity>
               </View>
             )}
@@ -361,7 +364,6 @@ const styles = StyleSheet.create({
     borderColor: THEME.colors.border,
   },
   searchIcon: {
-    fontSize: 15,
     marginRight: THEME.spacing.sm,
   },
   searchInput: {
@@ -372,11 +374,6 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     padding: 4,
-  },
-  clearBtnText: {
-    color: THEME.colors.textMuted,
-    fontSize: 12,
-    fontWeight: 'bold',
   },
   scanBtn: {
     flexDirection: 'row',
@@ -390,7 +387,6 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   scanBtnIcon: {
-    fontSize: 14,
     marginRight: 4,
   },
   scanBtnText: {
@@ -469,11 +465,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
-  closeModalText: {
-    color: THEME.colors.textSecondary,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   cartItemList: {
     padding: THEME.spacing.lg,
   },
@@ -481,10 +472,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 40,
-  },
-  emptyCartIcon: {
-    fontSize: 48,
-    marginBottom: 12,
   },
   emptyCartText: {
     color: THEME.colors.textSecondary,
@@ -529,10 +516,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     marginRight: 8,
-  },
-  modalCheckoutArrow: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
 });

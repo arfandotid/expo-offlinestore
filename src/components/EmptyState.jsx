@@ -1,13 +1,18 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Package } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 
-export default function EmptyState({ icon = '📦', title, subtitle, actionText, onAction }) {
+export default function EmptyState({
+  icon = <Package size={36} color={THEME.colors.primary} />,
+  title,
+  subtitle,
+  actionText,
+  onAction,
+}) {
   return (
     <View style={styles.container}>
-      <View style={styles.iconCircle}>
-        <Text style={styles.icon}>{icon}</Text>
-      </View>
+      <View style={styles.iconCircle}>{icon}</View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       {actionText && onAction && (
@@ -39,9 +44,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: THEME.spacing.lg,
-  },
-  icon: {
-    fontSize: 36,
   },
   title: {
     fontSize: 18,

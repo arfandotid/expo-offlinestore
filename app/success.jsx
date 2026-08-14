@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { Check, FileText, CircleCheck } from 'lucide-react-native';
 import { THEME } from '../src/constants/theme';
 import { formatRupiah } from '../src/components/ProductCard';
 import { shareReceiptPdf } from '../src/utils/receiptGenerator';
@@ -48,7 +49,7 @@ export default function SuccessScreen() {
         {/* Success Icon & Header */}
         <View style={styles.successHeader}>
           <View style={styles.checkCircle}>
-            <Text style={styles.checkIcon}>✓</Text>
+            <Check size={36} color="#ffffff" strokeWidth={3} />
           </View>
           <Text style={styles.successTitle}>Transaksi Berhasil!</Text>
           <Text style={styles.successSubtitle}>
@@ -89,7 +90,8 @@ export default function SuccessScreen() {
 
             {transaction.paymentMethod === 'QRIS' && transaction.proofPhotoUri && (
               <View style={styles.proofNoteRow}>
-                <Text style={styles.proofNote}>✓ Foto bukti transfer tersimpan</Text>
+                <CircleCheck size={14} color={THEME.colors.primaryDark} />
+                <Text style={styles.proofNote}>Foto bukti transfer tersimpan</Text>
               </View>
             )}
           </View>
@@ -111,7 +113,7 @@ export default function SuccessScreen() {
               </View>
             ) : (
               <View style={styles.btnContentRow}>
-                <Text style={styles.shareBtnIcon}>📄</Text>
+                <FileText size={18} color={THEME.colors.primaryDark} style={styles.shareBtnIcon} />
                 <Text style={styles.shareBtnText}>Bagikan Struk (PDF / WhatsApp)</Text>
               </View>
             )}
@@ -123,7 +125,10 @@ export default function SuccessScreen() {
             onPress={handleFinishTransaction}
             style={styles.doneBtn}
           >
-            <Text style={styles.doneBtnText}>✓ Selesai (Transaksi Baru)</Text>
+            <View style={styles.doneBtnContent}>
+              <Check size={16} color="#ffffff" />
+              <Text style={styles.doneBtnText}>Selesai (Transaksi Baru)</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -155,11 +160,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: THEME.spacing.md,
     ...THEME.shadow.card,
-  },
-  checkIcon: {
-    color: '#ffffff',
-    fontSize: 36,
-    fontWeight: '900',
   },
   successTitle: {
     fontSize: 22,
@@ -237,8 +237,11 @@ const styles = StyleSheet.create({
     color: THEME.colors.primaryDark,
   },
   proofNoteRow: {
-    marginTop: 10,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 10,
   },
   proofNote: {
     fontSize: 12,
@@ -269,7 +272,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   shareBtnIcon: {
-    fontSize: 18,
     marginRight: 8,
   },
   shareBtnText: {
@@ -282,6 +284,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     marginLeft: 8,
+  },
+  doneBtnContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
   },
   doneBtn: {
     backgroundColor: THEME.colors.primary,

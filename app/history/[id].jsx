@@ -10,10 +10,12 @@ import {
   Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { TriangleAlert, FileText, Trash2 } from 'lucide-react-native';
 import { transactionRepository } from '../../src/db/transactionRepository';
 import { THEME } from '../../src/constants/theme';
 import { formatRupiah } from '../../src/components/ProductCard';
 import { shareReceiptPdf } from '../../src/utils/receiptGenerator';
+import { formatTransactionNo } from '../../src/utils/transactionNumber';
 
 function formatFullDate(isoString) {
   if (!isoString) return '-';
@@ -57,6 +59,7 @@ export default function TransactionDetailScreen() {
     try {
       // Bentuk format data yang seragam untuk receiptGenerator
       const receiptData = {
+        id: transaction.id,
         items: transaction.items.map((item) => ({
           product: {
             nama: item.nama_produk,
@@ -93,7 +96,7 @@ export default function TransactionDetailScreen() {
   if (!transaction) {
     return (
       <View style={styles.notFoundContainer}>
-        <Text style={styles.notFoundIcon}>⚠️</Text>
+        <TriangleAlert size={48} color={THEME.colors.textSecondary} />
         <Text style={styles.notFoundTitle}>Transaksi Tidak Ditemukan</Text>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Text style={styles.backBtnText}>Kembali ke Riwayat</Text>
@@ -101,6 +104,34 @@ export default function TransactionDetailScreen() {
       </View>
     );
   }
+
+  // Hapus transaksi beserta rinciannya
+  const handleDeleteTransaction = () => {
+    Alert.alert(
+      'Hapus Transaksi',
+      'Apakah Anda yakin ingin menghapus transaksi ini? Data yang dihapus tidak dapat dikembalikan.',
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            try {
+              const deleted = transactionRepository.deleteTransaction(transaction.id);
+              if (deleted) {
+                router.back();
+              } else {
+                Alert.alert('Gagal', 'Transaksi tidak ditemukan atau gagal dihapus.');
+              }
+            } catch (error) {
+              console.error('Error deleting transaction:', error);
+              Alert.alert('Error', 'Gagal menghapus transaksi.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   const isQris = transaction.metode_bayar === 'QRIS';
 
@@ -116,7 +147,7 @@ export default function TransactionDetailScreen() {
             <View>
               <Text style={styles.receiptLabel}>No. Nota Transaksi</Text>
               <Text style={styles.receiptNo}>
-                TRX-{transaction.id.toString().padStart(5, '0')}
+                {formatTransactionNo(transaction.id, transaction.tanggal)}
               </Text>
             </View>
             <View
@@ -221,10 +252,22 @@ export default function TransactionDetailScreen() {
               </View>
             ) : (
               <View style={styles.btnContentRow}>
-                <Text style={styles.shareBtnIcon}>📄</Text>
+                <FileText size={18} color="#ffffff" style={styles.shareBtnIcon} />
                 <Text style={styles.shareBtnText}>Bagikan Struk Ulang (PDF / WhatsApp)</Text>
               </View>
             )}
+          </TouchableOpacity>
+
+          {/* Action Button: Hapus Transaksi */}
+          <TouchableOpacity
+            activeOpacity={0.85}
+            onPress={handleDeleteTransaction}
+            style={styles.deleteBtn}
+          >
+            <View style={styles.btnContentRow}>
+              <Trash2 size={18} color={THEME.colors.danger} style={styles.shareBtnIcon} />
+              <Text style={styles.deleteBtnText}>Hapus Transaksi</Text>
+            </View>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -257,14 +300,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: THEME.spacing.xl,
   },
-  notFoundIcon: {
-    fontSize: 48,
-    marginBottom: THEME.spacing.md,
-  },
   notFoundTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: THEME.colors.text,
+    marginTop: THEME.spacing.md,
     marginBottom: THEME.spacing.md,
   },
   backBtn: {
@@ -433,6 +473,7 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     marginTop: THEME.spacing.sm,
+    gap: THEME.spacing.md,
   },
   shareBtn: {
     backgroundColor: THEME.colors.primary,
@@ -441,6 +482,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     ...THEME.shadow.card,
+  },
+  deleteBtn: {
+    backgroundColor: THEME.colors.dangerLight,
+    borderWidth: 1,
+    borderColor: '#fca5a5',
+    paddingVertical: 16,
+    borderRadius: THEME.borderRadius.lg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  deleteBtnText: {
+    color: THEME.colors.danger,
+    fontSize: 15,
+    fontWeight: '800',
   },
   btnContentRow: {
     flexDirection: 'row',
@@ -451,7 +506,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   shareBtnIcon: {
-    fontSize: 18,
     marginRight: 8,
   },
   shareBtnText: {

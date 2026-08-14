@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { Package, Pencil, Trash2 } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 
 /**
@@ -25,7 +26,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
         {foto ? (
           <Image source={{ uri: foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Text style={styles.placeholderIcon}>📦</Text>
+          <Package size={28} color={THEME.colors.textMuted} />
         )}
       </View>
 
@@ -57,14 +58,14 @@ export default function ProductCard({ product, onEdit, onDelete }) {
           activeOpacity={0.7}
           style={styles.editButton}
         >
-          <Text style={styles.actionIcon}>✏️</Text>
+          <Pencil size={14} color={THEME.colors.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onDelete(product)}
           activeOpacity={0.7}
           style={styles.deleteButton}
         >
-          <Text style={styles.actionIcon}>🗑️</Text>
+          <Trash2 size={14} color={THEME.colors.dangerDark} />
         </TouchableOpacity>
       </View>
     </View>
@@ -97,9 +98,6 @@ const styles = StyleSheet.create({
   image: {
     width: '100%',
     height: '100%',
-  },
-  placeholderIcon: {
-    fontSize: 28,
   },
   infoContainer: {
     flex: 1,
@@ -169,8 +167,5 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.colors.dangerLight,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  actionIcon: {
-    fontSize: 14,
   },
 });

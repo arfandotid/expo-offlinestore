@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { X, CircleCheckBig, Banknote, TriangleAlert } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
 export default function CashPayment({
@@ -67,7 +68,7 @@ export default function CashPayment({
               onPress={() => onChangeCashAmount('')}
               style={styles.clearBtn}
             >
-              <Text style={styles.clearBtnText}>✕</Text>
+              <X size={14} color={THEME.colors.textMuted} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -123,9 +124,15 @@ export default function CashPayment({
             {isEnough ? formatRupiah(change) : formatRupiah(Math.abs(change))}
           </Text>
         </View>
-        <Text style={styles.changeStatusIcon}>
-          {isEnough ? (change === 0 ? '👌' : '💵') : '⚠️'}
-        </Text>
+        {isEnough ? (
+          change === 0 ? (
+            <CircleCheckBig size={28} color={THEME.colors.primaryDark} style={styles.changeStatusIcon} />
+          ) : (
+            <Banknote size={28} color={THEME.colors.primaryDark} style={styles.changeStatusIcon} />
+          )
+        ) : (
+          <TriangleAlert size={28} color={THEME.colors.dangerDark} style={styles.changeStatusIcon} />
+        )}
       </View>
     </View>
   );
@@ -172,11 +179,6 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     padding: 6,
-  },
-  clearBtnText: {
-    fontSize: 14,
-    color: THEME.colors.textMuted,
-    fontWeight: 'bold',
   },
   suggestionSection: {
     marginBottom: THEME.spacing.lg,
@@ -250,7 +252,6 @@ const styles = StyleSheet.create({
     color: THEME.colors.dangerDark,
   },
   changeStatusIcon: {
-    fontSize: 28,
     marginLeft: 12,
   },
 });
