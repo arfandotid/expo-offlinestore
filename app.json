@@ -23,7 +23,19 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Aplikasi membutuhkan izin kamera untuk memindai barcode produk dan mengambil foto bukti transaksi."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Aplikasi membutuhkan izin galeri untuk memilih foto produk lokal."
+        }
+      ]
     ]
   }
 }

@@ -1,10 +1,10 @@
-import '../global.css';
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View, Text, ActivityIndicator } from 'react-native';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initDatabase } from '../src/db/database';
+import { THEME } from '../src/constants/theme';
 
 export default function RootLayout() {
   const [dbReady, setDbReady] = useState(false);
@@ -23,9 +23,9 @@ export default function RootLayout() {
   if (error) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 justify-center items-center bg-red-50 p-6">
-          <Text className="text-xl font-bold text-red-600 mb-2">Error Database</Text>
-          <Text className="text-gray-700 text-center">{error}</Text>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>Error Database</Text>
+          <Text style={styles.errorMessage}>{error}</Text>
         </View>
       </SafeAreaProvider>
     );
@@ -34,9 +34,9 @@ export default function RootLayout() {
   if (!dbReady) {
     return (
       <SafeAreaProvider>
-        <View className="flex-1 justify-center items-center bg-slate-50">
-          <ActivityIndicator size="large" color="#16a34a" />
-          <Text className="mt-4 text-slate-600 font-medium">Menyiapkan Database Offline...</Text>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={THEME.colors.primary} />
+          <Text style={styles.loadingText}>Menyiapkan Database Offline...</Text>
         </View>
       </SafeAreaProvider>
     );
@@ -45,9 +45,71 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: THEME.colors.background },
+        }}
+      >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="products/form"
+          options={{
+            headerShown: true,
+            title: 'Form Produk',
+            headerBackTitle: 'Kembali',
+            presentation: 'modal',
+            headerStyle: { backgroundColor: THEME.colors.surface },
+            headerTitleStyle: {
+              fontWeight: '700',
+              fontSize: 17,
+              color: THEME.colors.text,
+            },
+            headerTintColor: THEME.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="products/scanner"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'fade',
+          }}
+        />
       </Stack>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.background,
+  },
+  loadingText: {
+    marginTop: THEME.spacing.md,
+    color: THEME.colors.textSecondary,
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.dangerLight,
+    padding: THEME.spacing.xl,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: THEME.colors.dangerDark,
+    marginBottom: THEME.spacing.sm,
+  },
+  errorMessage: {
+    fontSize: 14,
+    color: THEME.colors.text,
+    textAlign: 'center',
+  },
+});

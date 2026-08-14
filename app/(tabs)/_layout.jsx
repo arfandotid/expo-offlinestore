@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Text, StyleSheet, Platform } from 'react-native';
+import { THEME } from '../../src/constants/theme';
 
 export default function TabsLayout() {
   return (
@@ -8,23 +9,27 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: '#ffffff',
+          backgroundColor: THEME.colors.surface,
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: THEME.colors.borderLight,
         },
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 18,
-          color: '#0f172a',
+          color: THEME.colors.text,
         },
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#e2e8f0',
+          backgroundColor: THEME.colors.surface,
+          borderTopColor: THEME.colors.border,
           borderTopWidth: 1,
-          height: 62,
-          paddingBottom: 8,
-          paddingTop: 6,
+          height: Platform.OS === 'ios' ? 88 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          paddingTop: 8,
         },
-        tabBarActiveTintColor: '#16a34a',
-        tabBarInactiveTintColor: '#64748b',
+        tabBarActiveTintColor: THEME.colors.primary,
+        tabBarInactiveTintColor: THEME.colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
@@ -36,8 +41,8 @@ export default function TabsLayout() {
         options={{
           title: 'Penjualan',
           tabBarLabel: 'Penjualan',
-          tabBarIcon: ({ color, focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '🛒' : '🛍️'}</Text>
+          tabBarIcon: ({ focused }) => (
+            <Text style={styles.tabIcon}>{focused ? '🛒' : '🛍️'}</Text>
           ),
         }}
       />
@@ -46,11 +51,17 @@ export default function TabsLayout() {
         options={{
           title: 'Kelola Barang',
           tabBarLabel: 'Kelola Barang',
-          tabBarIcon: ({ color, focused }) => (
-            <Text style={{ fontSize: 20 }}>{focused ? '📦' : '📋'}</Text>
+          tabBarIcon: ({ focused }) => (
+            <Text style={styles.tabIcon}>{focused ? '📦' : '📋'}</Text>
           ),
         }}
       />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  tabIcon: {
+    fontSize: 20,
+  },
+});

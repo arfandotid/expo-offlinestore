@@ -1,52 +1,298 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+  RefreshControl,
+  StyleSheet,
+} from 'react-native';
+import { useRouter, useFocusEffect } from 'expo-router';
 import { productRepository } from '../../src/db/productRepository';
+import ProductCard from '../../src/components/ProductCard';
+import EmptyState from '../../src/components/EmptyState';
+import { THEME } from '../../src/constants/theme';
 
 export default function ProductsScreen() {
+  const router = useRouter();
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
+  // Memuat data produk dari database SQLite
+  const loadProducts = useCallback(() => {
     try {
-      const data = productRepository.getAllProducts();
-      setProducts(data);
+      if (searchQuery.trim()) {
+        const results = productRepository.searchProducts(searchQuery);
+        setProducts(results);
+      } else {
+        const all = productRepository.getAllProducts();
+        setProducts(all);
+      }
     } catch (error) {
-      console.error('Error fetching products:', error);
+      console.error('Error loading products:', error);
+      Alert.alert('Error', 'Gagal memuat daftar produk dari database.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  }, []);
+  }, [searchQuery]);
+
+  // Otomatis refresh saat layar dibuka kembali
+  useFocusEffect(
+    useCallback(() => {
+      loadProducts();
+    }, [loadProducts])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadProducts();
+  };
+
+  const handleEdit = (product) => {
+    router.push({
+      pathname: '/products/form',
+      params: {
+        id: product.id,
+        nama: product.nama,
+        kategori: product.kategori,
+        harga: product.harga.toString(),
+        foto: product.foto || '',
+        barcode: product.barcode || '',
+      },
+    });
+  };
+
+  const handleDelete = (product) => {
+    Alert.alert(
+      'Hapus Produk',
+      `Apakah Anda yakin ingin menghapus "${product.nama}"?`,
+      [
+        { text: 'Batal', style: 'cancel' },
+        {
+          text: 'Hapus',
+          style: 'destructive',
+          onPress: () => {
+            try {
+              productRepository.deleteProduct(product.id);
+              loadProducts();
+            } catch (err) {
+              console.error('Error deleting product:', err);
+              Alert.alert('Error', 'Gagal menghapus produk.');
+            }
+          },
+        },
+      ]
+    );
+  };
 
   return (
-    <View className="flex-1 bg-slate-50 p-4">
-      {/* DB Status Badge */}
-      <View className="flex-row justify-between items-center bg-white p-4 rounded-xl border border-slate-200 mb-4 shadow-sm">
-        <View className="flex-row items-center space-x-2">
-          <View className="w-3 h-3 rounded-full bg-emerald-500 mr-2" />
-          <Text className="text-sm font-semibold text-slate-800">
-            Status Database SQLite
-          </Text>
+    <View style={styles.container}>
+      {/* Search Header Bar */}
+      <View style={styles.searchHeader}>
+        <View style={styles.searchInputWrapper}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Cari nama barang atau barcode..."
+            placeholderTextColor={THEME.colors.textMuted}
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+            clearButtonMode="while-editing"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+              <Text style={styles.clearBtnText}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <Text className="text-xs bg-emerald-100 text-emerald-800 font-medium px-2.5 py-1 rounded-full">
-          Tabel Ready
-        </Text>
+
+        {/* Counter Info Bar */}
+        <View style={styles.counterRow}>
+          <Text style={styles.counterText}>
+            Total {products.length} barang terdaftar
+          </Text>
+          <View style={styles.statusIndicator}>
+            <View style={styles.statusDot} />
+            <Text style={styles.statusText}>Offline SQLite</Text>
+          </View>
+        </View>
       </View>
 
-      {/* Placeholder content untuk Fase 2 */}
-      <View className="flex-1 justify-center items-center bg-white rounded-2xl p-6 border border-slate-200 border-dashed">
-        <Text className="text-4xl mb-3">📦</Text>
-        <Text className="text-lg font-bold text-slate-800 text-center">
-          Daftar Master Barang (V1)
-        </Text>
-        <Text className="text-sm text-slate-500 text-center mt-2 px-4 leading-relaxed">
-          Tabel `products` SQLite siap menampung data (Nama, Kategori, Harga, Foto, Barcode). CRUD Produk akan diimplementasikan pada Fase 2.
-        </Text>
-        <View className="mt-4 bg-slate-100 px-4 py-2 rounded-lg">
-          <Text className="text-xs text-slate-600 font-medium">
-            Total Produk Tersimpan: {products.length} item
-          </Text>
+      {/* Main List Area */}
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={THEME.colors.primary} />
+          <Text style={styles.loadingText}>Memuat data produk...</Text>
         </View>
+      ) : (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerStyle={styles.listContent}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[THEME.colors.primary]}
+            />
+          }
+          renderItem={({ item }) => (
+            <ProductCard
+              product={item}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          )}
+          ListEmptyComponent={
+            <EmptyState
+              icon={searchQuery ? '🔍' : '📦'}
+              title={searchQuery ? 'Produk Tidak Ditemukan' : 'Belum Ada Barang'}
+              subtitle={
+                searchQuery
+                  ? `Tidak ada barang yang cocok dengan kata kunci "${searchQuery}".`
+                  : 'Mulai daftarkan master barang toko Anda dengan menekan tombol Tambah Barang di bawah.'
+              }
+              actionText={searchQuery ? 'Reset Pencarian' : '+ Tambah Barang Baru'}
+              onAction={() => {
+                if (searchQuery) {
+                  setSearchQuery('');
+                } else {
+                  router.push('/products/form');
+                }
+              }}
+            />
+          }
+        />
+      )}
+
+      {/* Floating Action Button (FAB) Tambah Barang */}
+      <View style={styles.fabContainer}>
+        <TouchableOpacity
+          onPress={() => router.push('/products/form')}
+          activeOpacity={0.85}
+          style={styles.fab}
+        >
+          <Text style={styles.fabPlus}>+</Text>
+          <Text style={styles.fabText}>Tambah Barang</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: THEME.colors.background,
+  },
+  searchHeader: {
+    backgroundColor: THEME.colors.surface,
+    paddingHorizontal: THEME.spacing.lg,
+    paddingTop: THEME.spacing.md,
+    paddingBottom: THEME.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: THEME.colors.borderLight,
+    ...THEME.shadow.card,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.background,
+    borderRadius: THEME.borderRadius.lg,
+    paddingHorizontal: THEME.spacing.md,
+    paddingVertical: THEME.spacing.sm,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+  },
+  searchIcon: {
+    fontSize: 16,
+    marginRight: THEME.spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    color: THEME.colors.text,
+    fontSize: 14,
+    padding: 0,
+  },
+  clearBtn: {
+    padding: 4,
+  },
+  clearBtnText: {
+    color: THEME.colors.textMuted,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  counterRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: THEME.spacing.md,
+  },
+  counterText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: THEME.colors.textSecondary,
+  },
+  statusIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: THEME.colors.primary,
+    marginRight: 6,
+  },
+  statusText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: THEME.colors.primaryDark,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 12,
+    color: THEME.colors.textMuted,
+    marginTop: THEME.spacing.sm,
+  },
+  listContent: {
+    padding: THEME.spacing.lg,
+    paddingBottom: 96,
+  },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+  },
+  fab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: THEME.borderRadius.full,
+    ...THEME.shadow.fab,
+  },
+  fabPlus: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginRight: 8,
+    lineHeight: 22,
+  },
+  fabText: {
+    color: '#ffffff',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+});

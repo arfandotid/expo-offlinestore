@@ -10,9 +10,10 @@
 
 ## 2. Spesifikasi Teknologi Inti
 
-- **Framework:** React Native (Expo dengan templat JavaScript/JSX).
+- **Framework:** React Native (Expo dengan template JavaScript/JSX).
+- **Styling:** React Native StyleSheet API (Clean, modular, & lightweight design system).
+- **Navigation:** Expo Router (File-based routing di dalam folder `app/`).
 - **Database:** SQLite (`expo-sqlite`).
-- **State Management:** React Context API (bawaan React agar ringan dan cepat).
 - **Hardware Access:** `expo-camera` (untuk scan barcode via kamera HP dan foto bukti QRIS), `expo-image-picker` (untuk upload foto produk lokal).
 - **Ekspor Struk:** `expo-print` (untuk generate PDF) dan `expo-sharing` (untuk share PDF ke WhatsApp).
 
@@ -41,14 +42,14 @@ Instruksikan AI Agent untuk mengerjakan per fase guna menghindari _context windo
 
 ### Fase 1: Inisialisasi Proyek & Setup Database
 
-**Fokus:** Membangun fondasi aplikasi berbasis JSX dan koneksi ke SQLite.
+**Fokus:** Membangun fondasi aplikasi berbasis JSX, navigasi Expo Router, dan koneksi ke SQLite.
 **Tugas:**
 
 1. Inisialisasi proyek Expo baru (wajib menggunakan template JavaScript/JSX kosong, bukan TypeScript).
-2. Instalasi dependensi navigasi (React Navigation: Stack & Tab).
-3. Instalasi `expo-sqlite`.
+2. Setup Expo Router untuk navigasi berbasis file (`app/` directory) dengan Bottom Tabs ("Penjualan" dan "Kelola Barang").
+3. Instalasi dan konfigurasi `expo-sqlite`.
 4. Buat file konfigurasi database yang mengeksekusi pembuatan tabel `products` saat aplikasi pertama kali dimuat.
-5. Buat kerangka Navigasi dasar: Bottom Tab Navigation (Tab "Penjualan" dan Tab "Kelola Barang").
+5. Bangun sistem styling terstruktur menggunakan StyleSheet API bawaan React Native.
 
 ### Fase 2: Modul Kelola Barang (CRUD Produk) Tanpa Stok
 
