@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Camera, X, Flashlight, Zap } from 'lucide-react-native';
@@ -12,11 +12,12 @@ export default function BarcodeScannerScreen() {
   const [scanned, setScanned] = useState(false);
   const [torch, setTorch] = useState(false);
   const [ready, setReady] = useState(false);
-  const [cameraKey, setCameraKey] = useState(0);
-  const remounted = useRef(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 250);
+    // Delay camera mount slightly to let the screen transition finish.
+    // Android needs a bit more time for the native view to be ready.
+    const delay = Platform.OS === 'android' ? 500 : 300;
+    const t = setTimeout(() => setReady(true), delay);
     return () => clearTimeout(t);
   }, []);
 
@@ -69,31 +70,27 @@ export default function BarcodeScannerScreen() {
     }
   };
 
-  const handleCameraReady = () => {
-    if (!remounted.current) {
-      remounted.current = true;
-      setCameraKey((k) => k + 1);
-    }
+  const handleMountError = (event) => {
+    console.warn('[Scanner] Camera mount error:', event?.message);
   };
 
   return (
     <View style={styles.container}>
       {ready && (
         <CameraView
-          key={cameraKey}
           style={StyleSheet.absoluteFillObject}
           facing="back"
           enableTorch={torch}
           barcodeScannerSettings={{
             barcodeTypes: ['qr', 'ean13'],
           }}
-          onCameraReady={handleCameraReady}
+          onMountError={handleMountError}
           onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
         />
       )}
 
-      {/* Overlay Mask */}
-      <View style={styles.overlay}>
+      {/* Overlay Mask — transparent so camera preview shows through */}
+      <View style={styles.overlay} pointerEvents="box-none">
         {/* Top bar controls */}
         <View style={styles.topBar}>
           <TouchableOpacity
@@ -120,7 +117,7 @@ export default function BarcodeScannerScreen() {
         </View>
 
         {/* Viewfinder Center Box */}
-        <View style={styles.viewfinderCenter}>
+        <View style={styles.viewfinderCenter} pointerEvents="none">
           <View style={styles.targetBox}>
             <View style={styles.laserLine} />
           </View>
@@ -199,9 +196,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   overlay: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'space-between',
     padding: THEME.spacing.lg,
+    backgroundColor: 'transparent',
   },
   topBar: {
     flexDirection: 'row',
