@@ -236,7 +236,7 @@ export default function SalesScreen() {
               <Search size={15} color={THEME.colors.textMuted} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
-                placeholder="Cari menu / nama barang..."
+                placeholder="Cari menu / nama produk..."
                 placeholderTextColor={THEME.colors.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -296,19 +296,19 @@ export default function SalesScreen() {
               }
               subtitle={
                 selectedCategory && !searchQuery
-                  ? `Belum ada barang di kategori "${selectedCategory}".`
+                  ? `Belum ada produk di kategori "${selectedCategory}".`
                   : searchQuery
-                  ? `Tidak ada barang yang cocok dengan "${searchQuery}"${
+                  ? `Tidak ada produk yang cocok dengan "${searchQuery}"${
                       selectedCategory ? ` di kategori "${selectedCategory}"` : ''
                     }.`
-                  : 'Belum ada produk yang terdaftar. Tambahkan master barang terlebih dahulu pada tab Kelola Barang.'
+                  : 'Belum ada produk yang terdaftar. Tambahkan master produk terlebih dahulu pada tab Kelola Produk.'
               }
               actionText={
                 selectedCategory && !searchQuery
                   ? 'Lihat Semua Kategori'
                   : searchQuery
                   ? 'Reset Pencarian'
-                  : 'Buka Kelola Barang'
+                  : 'Buka Kelola Produk'
               }
               onAction={() => {
                 if (selectedCategory && !searchQuery) {
@@ -346,7 +346,7 @@ export default function SalesScreen() {
             <View style={styles.modalHeader}>
               <View>
                 <Text style={styles.modalTitle}>Keranjang Belanja</Text>
-                <Text style={styles.modalSubtitle}>{totalItems} barang dipilih</Text>
+                <Text style={styles.modalSubtitle}>{totalItems} produk dipilih</Text>
               </View>
 
               <View style={styles.modalHeaderActions}>

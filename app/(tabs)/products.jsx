@@ -147,7 +147,7 @@ export default function ProductsScreen() {
             <Search size={16} color={THEME.colors.textMuted} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Cari nama barang atau barcode..."
+              placeholder="Cari nama produk atau barcode..."
               placeholderTextColor={THEME.colors.textMuted}
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
@@ -207,23 +207,23 @@ export default function ProductsScreen() {
                   ? 'Kategori Masih Kosong'
                   : searchQuery
                   ? 'Produk Tidak Ditemukan'
-                  : 'Belum Ada Barang'
+                  : 'Belum Ada Produk'
               }
               subtitle={
                 selectedCategory && !searchQuery
-                  ? `Belum ada barang di kategori "${selectedCategory}".`
+                  ? `Belum ada produk di kategori "${selectedCategory}".`
                   : searchQuery
-                  ? `Tidak ada barang yang cocok dengan kata kunci "${searchQuery}"${
+                  ? `Tidak ada produk yang cocok dengan kata kunci "${searchQuery}"${
                       selectedCategory ? ` di kategori "${selectedCategory}"` : ''
                     }.`
-                  : 'Mulai daftarkan master barang toko Anda dengan menekan tombol Tambah Barang di bawah.'
+                  : 'Mulai daftarkan master produk toko Anda dengan menekan tombol Tambah Produk di bawah.'
               }
               actionText={
                 selectedCategory && !searchQuery
                   ? 'Lihat Semua Kategori'
                   : searchQuery
                   ? 'Reset Pencarian'
-                  : '+ Tambah Barang Baru'
+                  : '+ Tambah Produk Baru'
               }
               onAction={() => {
                 if (selectedCategory && !searchQuery) {
@@ -239,14 +239,14 @@ export default function ProductsScreen() {
         />
       )}
 
-      {/* Floating Action Button (FAB) Tambah Barang */}
+      {/* Floating Action Button (FAB) Tambah Produk */}
       <View style={styles.fabContainer}>
         <TouchableOpacity
           onPress={() => router.push('/products/form')}
           activeOpacity={0.85}
           style={styles.fab}
         >
-          <Text style={styles.fabText}>Tambah Barang</Text>
+          <Text style={styles.fabText}>Tambah Produk</Text>
           <Plus size={20} color="#ffffff" style={styles.fabPlus} />
         </TouchableOpacity>
       </View>

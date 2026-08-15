@@ -77,13 +77,13 @@ export default function ProductFormScreen() {
   // Validasi dan Simpan ke SQLite
   const handleSave = () => {
     if (!nama.trim()) {
-      Alert.alert('Peringatan', 'Nama barang wajib diisi.');
+      Alert.alert('Peringatan', 'Nama produk wajib diisi.');
       return;
     }
 
     const numericPrice = parseFloat(harga.replace(/[^0-9]/g, ''));
     if (isNaN(numericPrice) || numericPrice <= 0) {
-      Alert.alert('Peringatan', 'Harga barang harus berupa angka lebih dari 0.');
+      Alert.alert('Peringatan', 'Harga produk harus berupa angka lebih dari 0.');
       return;
     }
 
@@ -155,10 +155,10 @@ export default function ProductFormScreen() {
           ) : null}
         </View>
 
-        {/* Input Nama Barang */}
+        {/* Input Nama Produk */}
         <View style={styles.fieldGroup}>
           <Text style={styles.fieldLabel}>
-            Nama Barang <Text style={styles.requiredAsterisk}>*</Text>
+            Nama Produk <Text style={styles.requiredAsterisk}>*</Text>
           </Text>
           <TextInput
             style={styles.textInput}

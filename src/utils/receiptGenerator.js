@@ -168,7 +168,7 @@ export function generateReceiptHtml(transaction) {
 
           <div class="divider"></div>
 
-          <!-- Daftar Barang -->
+          <!-- Daftar Produk -->
           <table class="items-table">
             <tbody>
               ${itemsHtml}
@@ -217,7 +217,7 @@ export function generateReceiptHtml(transaction) {
           <!-- Footer Struk -->
           <div class="footer">
             <div class="footer-thanks">TERIMA KASIH</div>
-            <div class="footer-sub">Barang yang sudah dibeli tidak dapat ditukar/dikembalikan</div>
+            <div class="footer-sub">Produk yang sudah dibeli tidak dapat ditukar/dikembalikan</div>
             <div class="footer-sub" style="margin-top: 6px;">*** Simpan struk ini sebagai bukti pembayaran ***</div>
           </div>
         </div>

@@ -97,7 +97,7 @@ export default function SuccessScreen() {
 
             <View style={styles.summaryRow}>
               <Text style={styles.summaryLabel}>Jumlah Item</Text>
-              <Text style={styles.summaryValue}>{transaction.totalItems} barang</Text>
+              <Text style={styles.summaryValue}>{transaction.totalItems} produk</Text>
             </View>
 
             {transaction.paymentMethod === 'TUNAI' && (

@@ -1,7 +1,7 @@
 import { getDatabase } from './database';
 
 /**
- * Repository fungsi untuk manipulasi tabel products (Master Data Barang)
+ * Repository fungsi untuk manipulasi tabel products (Master Data Produk)
  */
 export const productRepository = {
   /**
@@ -13,7 +13,7 @@ export const productRepository = {
   },
 
   /**
-   * Mengambil daftar kategori unik dari master barang
+   * Mengambil daftar kategori unik dari master produk
    */
   getCategories() {
     const db = getDatabase();

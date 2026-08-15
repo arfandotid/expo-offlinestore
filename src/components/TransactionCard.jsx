@@ -59,7 +59,7 @@ export default function TransactionCard({ transaction, onPress }) {
       <View style={styles.footerRow}>
         <View>
           <Text style={styles.itemsSummary}>
-            {total_qty || total_items || 1} barang terjual
+            {total_qty || total_items || 1} produk terjual
           </Text>
           <Text style={styles.totalPrice}>{formatRupiah(total_tagihan)}</Text>
         </View>

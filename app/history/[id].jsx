@@ -193,9 +193,9 @@ export default function TransactionDetailScreen() {
           <Text style={styles.dateText}>{formatFullDate(transaction.tanggal)}</Text>
         </View>
 
-        {/* Tabel Detail Barang yang Dibeli */}
+        {/* Tabel Detail Produk yang Dibeli */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Rincian Barang Belanja</Text>
+          <Text style={styles.sectionTitle}>Rincian Produk Belanja</Text>
           <View style={styles.divider} />
 
           {transaction.items && transaction.items.map((item, idx) => (

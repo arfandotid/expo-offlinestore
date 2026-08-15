@@ -106,7 +106,7 @@ export default function CheckoutScreen() {
           <View style={styles.totalInfo}>
             <Text style={styles.totalBadge}>Total Tagihan Transaksi</Text>
             <Text style={styles.totalPriceText}>{formatRupiah(totalPrice)}</Text>
-            <Text style={styles.itemCountText}>Untuk {totalItems} item barang</Text>
+            <Text style={styles.itemCountText}>Untuk {totalItems} item produk</Text>
           </View>
         </View>
 

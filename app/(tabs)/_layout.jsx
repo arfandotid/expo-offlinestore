@@ -54,8 +54,8 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="products"
         options={{
-          title: 'Kelola Barang',
-          tabBarLabel: 'Kelola Barang',
+          title: 'Kelola Produk',
+          tabBarLabel: 'Kelola Produk',
           tabBarIcon: ({ color, focused }) => (
             <Package size={22} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
