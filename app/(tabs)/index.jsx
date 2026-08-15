@@ -436,9 +436,9 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: THEME.spacing.md,
   },
   categoryFilterWrap: {
-    marginTop: THEME.spacing.md,
     marginHorizontal: -THEME.spacing.lg,
   },
   searchInputWrapper: {

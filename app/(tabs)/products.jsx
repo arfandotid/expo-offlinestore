@@ -279,6 +279,7 @@ const styles = StyleSheet.create({
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.md,
     paddingVertical: THEME.spacing.sm,
+    marginBottom: THEME.spacing.md,
     borderWidth: 1,
     borderColor: THEME.colors.border,
   },
@@ -295,7 +296,6 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   categoryFilterWrap: {
-    marginTop: THEME.spacing.md,
     marginHorizontal: -THEME.spacing.lg,
   },
   loadingContainer: {
