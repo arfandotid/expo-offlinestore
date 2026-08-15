@@ -15,25 +15,39 @@ import { Search, X, Plus } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import ProductCard from '../../src/components/ProductCard';
 import EmptyState from '../../src/components/EmptyState';
+import CategoryFilter from '../../src/components/CategoryFilter';
 import { THEME } from '../../src/constants/theme';
 
 export default function ProductsScreen() {
   const router = useRouter();
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Memuat daftar kategori dari database SQLite
+  const loadCategories = useCallback(() => {
+    try {
+      setCategories(productRepository.getCategories());
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  }, []);
+
   // Memuat data produk dari database SQLite
   const loadProducts = useCallback(() => {
     try {
-      if (searchQuery.trim()) {
-        const results = productRepository.searchProducts(searchQuery);
-        setProducts(results);
+      let results;
+      if (selectedCategory) {
+        results = productRepository.getProductsByCategory(selectedCategory, searchQuery);
+      } else if (searchQuery.trim()) {
+        results = productRepository.searchProducts(searchQuery);
       } else {
-        const all = productRepository.getAllProducts();
-        setProducts(all);
+        results = productRepository.getAllProducts();
       }
+      setProducts(results);
     } catch (error) {
       console.error('Error loading products:', error);
       Alert.alert('Error', 'Gagal memuat daftar produk dari database.');
@@ -41,13 +55,14 @@ export default function ProductsScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [searchQuery]);
+  }, [selectedCategory, searchQuery]);
 
   // Otomatis refresh saat layar dibuka kembali
   useFocusEffect(
     useCallback(() => {
+      loadCategories();
       loadProducts();
-    }, [loadProducts])
+    }, [loadCategories, loadProducts])
   );
 
   const onRefresh = () => {
@@ -113,6 +128,15 @@ export default function ProductsScreen() {
           )}
         </View>
 
+        {/* Filter Kategori */}
+        <View style={styles.categoryFilterWrap}>
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+        </View>
+
         {/* Counter Info Bar */}
         <View style={styles.counterRow}>
           <Text style={styles.counterText}>
@@ -155,15 +179,33 @@ export default function ProductsScreen() {
               icon={
                 <Search size={36} color={THEME.colors.primary} />
               }
-              title={searchQuery ? 'Produk Tidak Ditemukan' : 'Belum Ada Barang'}
+              title={
+                selectedCategory && !searchQuery
+                  ? 'Kategori Masih Kosong'
+                  : searchQuery
+                  ? 'Produk Tidak Ditemukan'
+                  : 'Belum Ada Barang'
+              }
               subtitle={
-                searchQuery
-                  ? `Tidak ada barang yang cocok dengan kata kunci "${searchQuery}".`
+                selectedCategory && !searchQuery
+                  ? `Belum ada barang di kategori "${selectedCategory}".`
+                  : searchQuery
+                  ? `Tidak ada barang yang cocok dengan kata kunci "${searchQuery}"${
+                      selectedCategory ? ` di kategori "${selectedCategory}"` : ''
+                    }.`
                   : 'Mulai daftarkan master barang toko Anda dengan menekan tombol Tambah Barang di bawah.'
               }
-              actionText={searchQuery ? 'Reset Pencarian' : '+ Tambah Barang Baru'}
+              actionText={
+                selectedCategory && !searchQuery
+                  ? 'Lihat Semua Kategori'
+                  : searchQuery
+                  ? 'Reset Pencarian'
+                  : '+ Tambah Barang Baru'
+              }
               onAction={() => {
-                if (searchQuery) {
+                if (selectedCategory && !searchQuery) {
+                  setSelectedCategory(null);
+                } else if (searchQuery) {
                   setSearchQuery('');
                 } else {
                   router.push('/products/form');
@@ -224,6 +266,10 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     padding: 4,
+  },
+  categoryFilterWrap: {
+    marginTop: THEME.spacing.md,
+    marginHorizontal: -THEME.spacing.lg,
   },
   counterRow: {
     flexDirection: 'row',

@@ -1,5 +1,7 @@
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
+import { Platform } from 'react-native';
+import { Directory, File } from 'expo-file-system';
 import { formatRupiah } from '../components/ProductCard';
 import { formatTransactionNo } from './transactionNumber';
 
@@ -253,4 +255,67 @@ export async function shareReceiptPdf(transaction) {
     dialogTitle: 'Bagikan Struk Transaksi ke WhatsApp / Pelanggan',
     UTI: 'com.adobe.pdf',
   });
+}
+
+/**
+ * Nama file PDF struk yang akan digunakan saat menyimpan/download
+ */
+export function getReceiptFileName(transaction) {
+  const receiptNo = formatTransactionNo(transaction.id, transaction.timestamp);
+  return `Struk-${receiptNo}.pdf`;
+}
+
+/**
+ * Cetak struk transaksi langsung via printer / AirPrint
+ */
+export async function printReceiptPdf(transaction) {
+  if (Platform.OS === 'web') {
+    throw new Error('Fitur cetak tidak didukung pada web.');
+  }
+
+  const pdfUri = await createReceiptPdf(transaction);
+  await Print.printAsync({ uri: pdfUri });
+}
+
+/**
+ * Download / simpan struk PDF ke perangkat.
+ * - Android: membuka folder picker (SAF) agar pengguna memilih lokasi (mis. Downloads).
+ * - iOS: membuka share sheet dengan opsi "Save to Files".
+ * Mengembalikan uri file yang tersimpan, atau null jika dibatalkan.
+ */
+export async function downloadReceiptPdf(transaction) {
+  const pdfUri = await createReceiptPdf(transaction);
+
+  if (Platform.OS === 'android') {
+    let dir;
+    try {
+      dir = await Directory.pickDirectoryAsync();
+    } catch (error) {
+      // Pengguna membatalkan pemilihan folder → bukan error
+      if (/cancel/i.test(error?.message || '')) {
+        return null;
+      }
+      throw error;
+    }
+    if (!dir?.uri) {
+      return null;
+    }
+
+    const source = new File(pdfUri);
+    const dest = new File(dir, getReceiptFileName(transaction));
+    source.copy(dest);
+    return dest.uri;
+  }
+
+  const isAvailable = await Sharing.isAvailableAsync();
+  if (!isAvailable) {
+    throw new Error('Fitur menyimpan file tidak didukung pada perangkat ini.');
+  }
+
+  await Sharing.shareAsync(pdfUri, {
+    mimeType: 'application/pdf',
+    dialogTitle: 'Simpan Struk PDF',
+    UTI: 'com.adobe.pdf',
+  });
+  return pdfUri;
 }

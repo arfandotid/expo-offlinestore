@@ -1,10 +1,14 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShoppingCart, Package, Receipt } from 'lucide-react-native';
 import { THEME } from '../../src/constants/theme';
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
+  const bottomInset = Platform.OS === 'android' ? insets.bottom : 0;
+
   return (
     <Tabs
       screenOptions={{
@@ -25,8 +29,8 @@ export default function TabsLayout() {
           backgroundColor: THEME.colors.surface,
           borderTopColor: THEME.colors.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          height: (Platform.OS === 'ios' ? 88 : 64) + bottomInset,
+          paddingBottom: (Platform.OS === 'ios' ? 28 : 10) + bottomInset,
           paddingTop: 8,
         },
         tabBarActiveTintColor: THEME.colors.primary,

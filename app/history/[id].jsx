@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,16 @@ import {
   Alert,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { TriangleAlert, FileText, Trash2 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { TriangleAlert, Printer, Download, Share2, Trash2 } from 'lucide-react-native';
 import { transactionRepository } from '../../src/db/transactionRepository';
 import { THEME } from '../../src/constants/theme';
 import { formatRupiah } from '../../src/components/ProductCard';
-import { shareReceiptPdf } from '../../src/utils/receiptGenerator';
+import {
+  shareReceiptPdf,
+  printReceiptPdf,
+  downloadReceiptPdf,
+} from '../../src/utils/receiptGenerator';
 import { formatTransactionNo } from '../../src/utils/transactionNumber';
 
 function formatFullDate(isoString) {
@@ -33,10 +38,29 @@ function formatFullDate(isoString) {
 export default function TransactionDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [sharing, setSharing] = useState(false);
+  const [actionLoading, setActionLoading] = useState(null); // 'download' | 'print' | 'share' | null
+
+  // Format data transaksi agar seragam dengan receiptGenerator
+  const buildReceiptData = (transaction) => ({
+    id: transaction.id,
+    items: transaction.items.map((item) => ({
+      product: {
+        nama: item.nama_produk,
+        harga: item.harga_satuan,
+      },
+      qty: item.qty,
+    })),
+    totalPrice: transaction.total_tagihan,
+    totalItems: transaction.items.reduce((sum, item) => sum + item.qty, 0),
+    paymentMethod: transaction.metode_bayar,
+    cashReceived: transaction.nominal_bayar,
+    changeAmount: transaction.kembalian,
+    timestamp: transaction.tanggal,
+  });
 
   useEffect(() => {
     if (id) {
@@ -52,37 +76,31 @@ export default function TransactionDetailScreen() {
     }
   }, [id]);
 
-  // Handle cetak ulang struk ke PDF / WhatsApp
-  const handleShareReceipt = async () => {
-    if (!transaction) return;
-    setSharing(true);
-    try {
-      // Bentuk format data yang seragam untuk receiptGenerator
-      const receiptData = {
-        id: transaction.id,
-        items: transaction.items.map((item) => ({
-          product: {
-            nama: item.nama_produk,
-            harga: item.harga_satuan,
-          },
-          qty: item.qty,
-        })),
-        totalPrice: transaction.total_tagihan,
-        totalItems: transaction.items.reduce((sum, item) => sum + item.qty, 0),
-        paymentMethod: transaction.metode_bayar,
-        cashReceived: transaction.nominal_bayar,
-        changeAmount: transaction.kembalian,
-        timestamp: transaction.tanggal,
-      };
-
-      await shareReceiptPdf(receiptData);
-    } catch (error) {
-      console.error('Error sharing receipt:', error);
-      Alert.alert('Gagal Membagikan', error.message || 'Terjadi kesalahan saat membagikan struk.');
-    } finally {
-      setSharing(false);
-    }
-  };
+  // Jalankan aksi unduh / cetak / bagikan struk
+  const runAction = useCallback(
+    async (type) => {
+      if (!transaction || actionLoading) return;
+      setActionLoading(type);
+      try {
+        if (type === 'download') {
+          await downloadReceiptPdf(buildReceiptData(transaction));
+        } else if (type === 'print') {
+          await printReceiptPdf(buildReceiptData(transaction));
+        } else {
+          await shareReceiptPdf(buildReceiptData(transaction));
+        }
+      } catch (error) {
+        console.error(`Error ${type} receipt:`, error);
+        Alert.alert(
+          'Gagal',
+          error.message || 'Terjadi kesalahan saat memproses struk.'
+        );
+      } finally {
+        setActionLoading(null);
+      }
+    },
+    [transaction, actionLoading]
+  );
 
   if (loading) {
     return (
@@ -135,10 +153,16 @@ export default function TransactionDetailScreen() {
 
   const isQris = transaction.metode_bayar === 'QRIS';
 
+  const actions = [
+    { key: 'download', icon: Download, label: 'Unduh' },
+    { key: 'print', icon: Printer, label: 'Cetak' },
+    { key: 'share', icon: Share2, label: 'Bagikan' },
+  ];
+
   return (
     <View style={styles.container}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 40 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Header Nota & Tanggal */}
@@ -237,39 +261,49 @@ export default function TransactionDetailScreen() {
           </View>
         ) : null}
 
-        {/* Action Button: Cetak / Bagikan Ulang Struk PDF */}
+        {/* Action Buttons: Unduh / Cetak / Bagikan (sama seperti checkout berhasil) */}
         <View style={styles.actionSection}>
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={handleShareReceipt}
-            disabled={sharing}
-            style={styles.shareBtn}
-          >
-            {sharing ? (
-              <View style={styles.btnLoadingRow}>
-                <ActivityIndicator size="small" color="#ffffff" />
-                <Text style={styles.shareBtnText}>Menyiapkan PDF...</Text>
-              </View>
-            ) : (
-              <View style={styles.btnContentRow}>
-                <FileText size={18} color="#ffffff" style={styles.shareBtnIcon} />
-                <Text style={styles.shareBtnText}>Bagikan Struk Ulang (PDF / WhatsApp)</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {/* Action Button: Hapus Transaksi */}
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={handleDeleteTransaction}
-            style={styles.deleteBtn}
-          >
-            <View style={styles.btnContentRow}>
-              <Trash2 size={18} color={THEME.colors.danger} style={styles.shareBtnIcon} />
-              <Text style={styles.deleteBtnText}>Hapus Transaksi</Text>
-            </View>
-          </TouchableOpacity>
+          {actions.map(({ key, icon: Icon, label }) => {
+            const isActive = actionLoading === key;
+            const disabled = actionLoading !== null;
+            return (
+              <TouchableOpacity
+                key={key}
+                activeOpacity={0.8}
+                disabled={disabled}
+                onPress={() => runAction(key)}
+                style={[styles.actionItem, disabled && styles.actionItemDisabled]}
+              >
+                <View style={[styles.actionIconCircle, isActive && styles.actionIconCircleActive]}>
+                  {isActive ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <Icon
+                      size={20}
+                      color={disabled ? THEME.colors.textMuted : THEME.colors.primaryDark}
+                      strokeWidth={2.2}
+                    />
+                  )}
+                </View>
+                <Text style={[styles.actionLabel, disabled && styles.actionLabelDisabled]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
+
+        {/* Action Button: Hapus Transaksi */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={handleDeleteTransaction}
+          style={styles.deleteBtn}
+        >
+          <View style={styles.btnContentRow}>
+            <Trash2 size={18} color={THEME.colors.danger} style={styles.shareBtnIcon} />
+            <Text style={styles.deleteBtnText}>Hapus Transaksi</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -472,16 +506,46 @@ const styles = StyleSheet.create({
     height: 220,
   },
   actionSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.surface,
+    borderRadius: THEME.borderRadius.xl,
+    paddingVertical: THEME.spacing.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
     marginTop: THEME.spacing.sm,
-    gap: THEME.spacing.md,
+    marginBottom: THEME.spacing.md,
+    ...THEME.shadow.card,
   },
-  shareBtn: {
-    backgroundColor: THEME.colors.primary,
-    paddingVertical: 16,
-    borderRadius: THEME.borderRadius.lg,
+  actionItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  actionItemDisabled: {
+    opacity: 0.6,
+  },
+  actionIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: THEME.colors.primarySoft,
+    borderWidth: 1.5,
+    borderColor: THEME.colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
-    ...THEME.shadow.card,
+  },
+  actionIconCircleActive: {
+    backgroundColor: THEME.colors.primary,
+    borderColor: THEME.colors.primary,
+  },
+  actionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.colors.primaryDark,
+  },
+  actionLabelDisabled: {
+    color: THEME.colors.textMuted,
   },
   deleteBtn: {
     backgroundColor: THEME.colors.dangerLight,
@@ -501,16 +565,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  btnLoadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   shareBtnIcon: {
     marginRight: 8,
-  },
-  shareBtnText: {
-    color: '#ffffff',
-    fontSize: 15,
-    fontWeight: '800',
   },
 });

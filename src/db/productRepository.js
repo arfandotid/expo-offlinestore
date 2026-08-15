@@ -13,6 +13,38 @@ export const productRepository = {
   },
 
   /**
+   * Mengambil daftar kategori unik dari master barang
+   */
+  getCategories() {
+    const db = getDatabase();
+    return db
+      .getAllSync(
+        "SELECT DISTINCT kategori FROM products WHERE kategori IS NOT NULL AND TRIM(kategori) != '' ORDER BY kategori ASC;"
+      )
+      .map((row) => row.kategori);
+  },
+
+  /**
+   * Mengambil produk berdasarkan kategori, dengan pencarian opsional
+   * (pencarian dibatasi hanya dalam kategori tersebut)
+   */
+  getProductsByCategory(category, query = '') {
+    const db = getDatabase();
+    if (!category) return this.getAllProducts();
+
+    if (query.trim()) {
+      const cleanQuery = `%${query.trim()}%`;
+      return db.getAllSync(
+        'SELECT * FROM products WHERE kategori = ? AND (nama LIKE ? OR barcode LIKE ?) ORDER BY id DESC;',
+        [category, cleanQuery, cleanQuery]
+      );
+    }
+    return db.getAllSync('SELECT * FROM products WHERE kategori = ? ORDER BY id DESC;', [
+      category,
+    ]);
+  },
+
+  /**
    * Mencari produk berdasarkan Nama atau Barcode
    */
   searchProducts(query = '') {

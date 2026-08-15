@@ -18,6 +18,7 @@ import CatalogCard from '../../src/components/CatalogCard';
 import CartItem from '../../src/components/CartItem';
 import CartSummary from '../../src/components/CartSummary';
 import EmptyState from '../../src/components/EmptyState';
+import CategoryFilter from '../../src/components/CategoryFilter';
 import { THEME } from '../../src/constants/theme';
 import { formatRupiah } from '../../src/components/ProductCard';
 
@@ -27,32 +28,53 @@ export default function SalesScreen() {
 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]); // Array: { product: Object, qty: Number }
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
   const [cartModalVisible, setCartModalVisible] = useState(false);
 
+  // Memuat daftar kategori dari database SQLite
+  const loadCategories = useCallback(() => {
+    try {
+      setCategories(productRepository.getCategories());
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  }, []);
+
   // Memuat data katalog dari database SQLite
   const loadProducts = useCallback(() => {
     try {
-      if (searchQuery.trim()) {
-        const results = productRepository.searchProducts(searchQuery);
-        setProducts(results);
+      let results;
+      if (selectedCategory) {
+        results = productRepository.getProductsByCategory(selectedCategory, searchQuery);
+      } else if (searchQuery.trim()) {
+        results = productRepository.searchProducts(searchQuery);
       } else {
-        const all = productRepository.getAllProducts();
-        setProducts(all);
+        results = productRepository.getAllProducts();
       }
+      setProducts(results);
     } catch (error) {
       console.error('Error loading products for catalog:', error);
     } finally {
       setLoading(false);
     }
-  }, [searchQuery]);
+  }, [selectedCategory, searchQuery]);
 
   // Muat ulang saat layar di-focus
   useFocusEffect(
     useCallback(() => {
+      loadCategories();
       loadProducts();
-    }, [loadProducts])
+
+      // Reset keranjang setelah transaksi selesai (parameter dari layar success)
+      if (params?.resetCart === '1') {
+        setCart([]);
+        setCartModalVisible(false);
+        router.setParams({ resetCart: undefined });
+      }
+    }, [loadProducts, loadCategories, params?.resetCart])
   );
 
   // Handle barcode yang di-scan dari kamera
@@ -198,6 +220,15 @@ export default function SalesScreen() {
             <Text style={styles.scanBtnText}>Scan</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Filter Kategori */}
+        <View style={styles.categoryFilterWrap}>
+          <CategoryFilter
+            categories={categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+        </View>
       </View>
 
       {/* Grid Katalog Produk (2 Kolom) */}
@@ -225,15 +256,33 @@ export default function SalesScreen() {
               icon={
                 <Search size={36} color={THEME.colors.primary} />
               }
-              title={searchQuery ? 'Produk Tidak Ditemukan' : 'Katalog Masih Kosong'}
+              title={
+                selectedCategory && !searchQuery
+                  ? 'Kategori Masih Kosong'
+                  : searchQuery
+                  ? 'Produk Tidak Ditemukan'
+                  : 'Katalog Masih Kosong'
+              }
               subtitle={
-                searchQuery
-                  ? `Tidak ada barang yang cocok dengan "${searchQuery}".`
+                selectedCategory && !searchQuery
+                  ? `Belum ada barang di kategori "${selectedCategory}".`
+                  : searchQuery
+                  ? `Tidak ada barang yang cocok dengan "${searchQuery}"${
+                      selectedCategory ? ` di kategori "${selectedCategory}"` : ''
+                    }.`
                   : 'Belum ada produk yang terdaftar. Tambahkan master barang terlebih dahulu pada tab Kelola Barang.'
               }
-              actionText={searchQuery ? 'Reset Pencarian' : 'Buka Kelola Barang'}
+              actionText={
+                selectedCategory && !searchQuery
+                  ? 'Lihat Semua Kategori'
+                  : searchQuery
+                  ? 'Reset Pencarian'
+                  : 'Buka Kelola Barang'
+              }
               onAction={() => {
-                if (searchQuery) {
+                if (selectedCategory && !searchQuery) {
+                  setSelectedCategory(null);
+                } else if (searchQuery) {
                   setSearchQuery('');
                 } else {
                   router.push('/products');
@@ -351,6 +400,10 @@ const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  categoryFilterWrap: {
+    marginTop: THEME.spacing.md,
+    marginHorizontal: -THEME.spacing.lg,
   },
   searchInputWrapper: {
     flex: 1,

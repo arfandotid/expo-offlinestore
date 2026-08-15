@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,41 +9,66 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Check, FileText, CircleCheck } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Check, CircleCheck, Download, Printer, Share2 } from 'lucide-react-native';
 import { THEME } from '../src/constants/theme';
 import { formatRupiah } from '../src/components/ProductCard';
-import { shareReceiptPdf } from '../src/utils/receiptGenerator';
+import {
+  downloadReceiptPdf,
+  printReceiptPdf,
+  shareReceiptPdf,
+} from '../src/utils/receiptGenerator';
 
 export default function SuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const insets = useSafeAreaInsets();
 
-  const [sharing, setSharing] = useState(false);
+  const [actionLoading, setActionLoading] = useState(null); // 'download' | 'print' | 'share' | null
+
   const transaction = params?.transactionJson ? JSON.parse(params.transactionJson) : null;
 
-  // Bagikan Struk ke WhatsApp / Media lain via PDF
-  const handleShareReceipt = async () => {
-    if (!transaction) return;
-    setSharing(true);
-    try {
-      await shareReceiptPdf(transaction);
-    } catch (error) {
-      console.error('Error sharing receipt PDF:', error);
-      Alert.alert('Gagal Membagikan', error.message || 'Terjadi kesalahan saat membagikan struk PDF.');
-    } finally {
-      setSharing(false);
-    }
-  };
+  // Jalankan aksi download / cetak / bagikan
+  const runAction = useCallback(
+    async (type) => {
+      if (!transaction || actionLoading) return;
+      setActionLoading(type);
+      try {
+        if (type === 'download') {
+          await downloadReceiptPdf(transaction);
+        } else if (type === 'print') {
+          await printReceiptPdf(transaction);
+        } else {
+          await shareReceiptPdf(transaction);
+        }
+      } catch (error) {
+        console.error(`Error ${type} receipt PDF:`, error);
+        Alert.alert(
+          'Gagal',
+          error.message || 'Terjadi kesalahan saat memproses struk PDF.'
+        );
+      } finally {
+        setActionLoading(null);
+      }
+    },
+    [transaction, actionLoading]
+  );
 
   // Selesaikan alur transaksi dan kembali ke kasir baru
   const handleFinishTransaction = () => {
-    router.replace('/');
+    router.replace({ pathname: '/', params: { resetCart: '1' } });
   };
 
+  const actions = [
+    { key: 'download', icon: Download, label: 'Unduh' },
+    { key: 'print', icon: Printer, label: 'Cetak' },
+    { key: 'share', icon: Share2, label: 'Bagikan' },
+  ];
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       <ScrollView
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent, { paddingBottom: insets.bottom + 24 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Success Icon & Header */}
@@ -57,7 +82,7 @@ export default function SuccessScreen() {
           </Text>
         </View>
 
-        {/* Ringkasan Transaksi */}
+        {/* Ringkasan Detail Transaksi */}
         {transaction && (
           <View style={styles.summaryCard}>
             <View style={styles.summaryRow}>
@@ -97,40 +122,49 @@ export default function SuccessScreen() {
           </View>
         )}
 
-        {/* Action Buttons: Bagikan Struk & Selesai */}
+        {/* Action Buttons: Unduh / Cetak / Bagikan */}
         <View style={styles.actionSection}>
-          {/* Tombol Bagikan Struk PDF / WhatsApp */}
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={handleShareReceipt}
-            disabled={sharing}
-            style={styles.shareBtn}
-          >
-            {sharing ? (
-              <View style={styles.btnLoadingRow}>
-                <ActivityIndicator size="small" color="#16a34a" />
-                <Text style={styles.shareBtnTextLoading}>Menyiapkan PDF...</Text>
-              </View>
-            ) : (
-              <View style={styles.btnContentRow}>
-                <FileText size={18} color={THEME.colors.primaryDark} style={styles.shareBtnIcon} />
-                <Text style={styles.shareBtnText}>Bagikan Struk (PDF / WhatsApp)</Text>
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {/* Tombol Selesai (Transaksi Baru) */}
-          <TouchableOpacity
-            activeOpacity={0.85}
-            onPress={handleFinishTransaction}
-            style={styles.doneBtn}
-          >
-            <View style={styles.doneBtnContent}>
-              <Check size={16} color="#ffffff" />
-              <Text style={styles.doneBtnText}>Selesai (Transaksi Baru)</Text>
-            </View>
-          </TouchableOpacity>
+          {actions.map(({ key, icon: Icon, label }) => {
+            const isActive = actionLoading === key;
+            const disabled = actionLoading !== null;
+            return (
+              <TouchableOpacity
+                key={key}
+                activeOpacity={0.8}
+                disabled={disabled}
+                onPress={() => runAction(key)}
+                style={[styles.actionItem, disabled && styles.actionItemDisabled]}
+              >
+                <View style={[styles.actionIconCircle, isActive && styles.actionIconCircleActive]}>
+                  {isActive ? (
+                    <ActivityIndicator size="small" color="#ffffff" />
+                  ) : (
+                    <Icon
+                      size={20}
+                      color={disabled ? THEME.colors.textMuted : THEME.colors.primaryDark}
+                      strokeWidth={2.2}
+                    />
+                  )}
+                </View>
+                <Text style={[styles.actionLabel, disabled && styles.actionLabelDisabled]}>
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
+
+        {/* Tombol Selesai */}
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={handleFinishTransaction}
+          style={styles.doneBtn}
+        >
+          <View style={styles.doneBtnContent}>
+            <Check size={16} color="#ffffff" />
+            <Text style={styles.doneBtnText}>Selesai</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -143,9 +177,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: THEME.spacing.lg,
-    paddingTop: THEME.spacing.xxl,
-    paddingBottom: 40,
-    alignItems: 'center',
+    paddingTop: THEME.spacing.lg,
   },
   successHeader: {
     alignItems: 'center',
@@ -250,40 +282,53 @@ const styles = StyleSheet.create({
   },
   actionSection: {
     width: '100%',
-    gap: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: THEME.colors.surface,
+    borderRadius: THEME.borderRadius.xl,
+    paddingVertical: THEME.spacing.lg,
+    borderWidth: 1,
+    borderColor: THEME.colors.border,
+    marginBottom: THEME.spacing.xl,
+    ...THEME.shadow.card,
   },
-  shareBtn: {
+  actionItem: {
+    alignItems: 'center',
+    gap: 6,
+  },
+  actionItemDisabled: {
+    opacity: 0.6,
+  },
+  actionIconCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: THEME.colors.primarySoft,
     borderWidth: 1.5,
+    borderColor: THEME.colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionIconCircleActive: {
+    backgroundColor: THEME.colors.primary,
     borderColor: THEME.colors.primary,
-    paddingVertical: 15,
+  },
+  actionLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: THEME.colors.primaryDark,
+  },
+  actionLabelDisabled: {
+    color: THEME.colors.textMuted,
+  },
+  doneBtn: {
+    backgroundColor: THEME.colors.primary,
+    paddingVertical: 16,
     borderRadius: THEME.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  btnContentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  btnLoadingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  shareBtnIcon: {
-    marginRight: 8,
-  },
-  shareBtnText: {
-    color: THEME.colors.primaryDark,
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  shareBtnTextLoading: {
-    color: THEME.colors.primaryDark,
-    fontSize: 14,
-    fontWeight: '700',
-    marginLeft: 8,
+    ...THEME.shadow.card,
   },
   doneBtnContent: {
     flexDirection: 'row',
@@ -291,17 +336,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
   },
-  doneBtn: {
-    backgroundColor: THEME.colors.primary,
-    paddingVertical: 15,
-    borderRadius: THEME.borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...THEME.shadow.card,
-  },
   doneBtnText: {
     color: '#ffffff',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
   },
 });
