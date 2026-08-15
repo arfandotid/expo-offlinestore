@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Check, CircleCheck, Download, Printer, Share2 } from 'lucide-react-native';
 import { THEME } from '../src/constants/theme';
+import { useTheme } from '../src/theme/ThemeProvider';
 import { formatRupiah } from '../src/components/ProductCard';
 import {
   downloadReceiptPdf,
@@ -23,6 +24,8 @@ export default function SuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [actionLoading, setActionLoading] = useState(null); // 'download' | 'print' | 'share' | null
 
@@ -115,7 +118,7 @@ export default function SuccessScreen() {
 
             {transaction.paymentMethod === 'QRIS' && transaction.proofPhotoUri && (
               <View style={styles.proofNoteRow}>
-                <CircleCheck size={14} color={THEME.colors.primaryDark} />
+                <CircleCheck size={14} color={colors.primaryDark} />
                 <Text style={styles.proofNote}>Foto bukti transfer tersimpan</Text>
               </View>
             )}
@@ -141,7 +144,7 @@ export default function SuccessScreen() {
                   ) : (
                     <Icon
                       size={20}
-                      color={disabled ? THEME.colors.textMuted : THEME.colors.primaryDark}
+                      color={disabled ? colors.textMuted : colors.primaryDark}
                       strokeWidth={2.2}
                     />
                   )}
@@ -170,10 +173,10 @@ export default function SuccessScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: THEME.spacing.lg,
@@ -187,7 +190,7 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     borderRadius: 36,
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: THEME.spacing.md,
@@ -196,22 +199,22 @@ const styles = StyleSheet.create({
   successTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
     textAlign: 'center',
   },
   successSubtitle: {
     fontSize: 13,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: 4,
   },
   summaryCard: {
     width: '100%',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.xl,
     ...THEME.shadow.card,
   },
@@ -221,34 +224,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
   },
   summaryLabel: {
     fontSize: 13,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   summaryValue: {
     fontSize: 14,
-    color: THEME.colors.text,
+    color: colors.text,
     fontWeight: '700',
   },
   summaryValueBold: {
     fontSize: 15,
-    color: THEME.colors.text,
+    color: colors.text,
     fontWeight: '800',
   },
   summaryValueBadge: {
     fontSize: 12,
     fontWeight: '800',
-    color: THEME.colors.primaryDark,
-    backgroundColor: THEME.colors.primarySoft,
+    color: colors.primaryDark,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
   },
   changeRow: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     marginHorizontal: -THEME.spacing.lg,
     marginBottom: -THEME.spacing.lg,
     marginTop: THEME.spacing.xs,
@@ -261,12 +264,12 @@ const styles = StyleSheet.create({
   changeLabel: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   changeValue: {
     fontSize: 18,
     fontWeight: '900',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   proofNoteRow: {
     flexDirection: 'row',
@@ -278,18 +281,18 @@ const styles = StyleSheet.create({
   proofNote: {
     fontSize: 12,
     fontWeight: '600',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   actionSection: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     paddingVertical: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.xl,
     ...THEME.shadow.card,
   },
@@ -304,26 +307,26 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1.5,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionIconCircleActive: {
-    backgroundColor: THEME.colors.primary,
-    borderColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   actionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   actionLabelDisabled: {
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
   },
   doneBtn: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: THEME.borderRadius.lg,
     alignItems: 'center',

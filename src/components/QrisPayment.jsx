@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { Smartphone, Camera, CircleCheck } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { formatRupiah } from './ProductCard';
 import { settingsRepository } from '../db/settingsRepository';
 
@@ -18,6 +19,8 @@ export default function QrisPayment({
   proofPhotoUri,
   onSetProofPhoto,
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [settings, setSettings] = useState(settingsRepository.getSettings());
 
   useEffect(() => {
@@ -77,7 +80,7 @@ export default function QrisPayment({
             <View style={styles.qrCornerTopRight} />
             <View style={styles.qrCornerBottomLeft} />
 
-            <Smartphone size={44} color={THEME.colors.text} style={styles.qrIcon} />
+            <Smartphone size={44} color={colors.text} style={styles.qrIcon} />
             <Text style={styles.qrHint}>NMID: ID102003847592</Text>
           </View>
         )}
@@ -95,7 +98,7 @@ export default function QrisPayment({
           <Text style={styles.proofLabel}>Foto Bukti Transfer Pelanggan</Text>
           {proofPhotoUri ? (
             <View style={styles.verifiedBadge}>
-              <CircleCheck size={12} color={THEME.colors.primaryDark} />
+              <CircleCheck size={12} color={colors.primaryDark} />
               <Text style={styles.verifiedText}>Bukti Terlampir</Text>
             </View>
           ) : (
@@ -116,7 +119,7 @@ export default function QrisPayment({
                 onPress={handleTakeProofPhoto}
                 style={styles.retakeBtn}
               >
-                <Camera size={12} color={THEME.colors.primaryDark} />
+                <Camera size={12} color={colors.primaryDark} />
                 <Text style={styles.retakeBtnText}>Foto Ulang</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -134,7 +137,7 @@ export default function QrisPayment({
             onPress={handleTakeProofPhoto}
             style={styles.takePhotoBtn}
           >
-            <Camera size={32} color={THEME.colors.primary} style={styles.cameraIcon} />
+            <Camera size={32} color={colors.primary} style={styles.cameraIcon} />
             <Text style={styles.takePhotoText}>Ambil Foto Bukti Transfer</Text>
             <Text style={styles.takePhotoHint}>
               Potret layar HP pelanggan setelah transfer sukses
@@ -146,17 +149,17 @@ export default function QrisPayment({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     paddingVertical: THEME.spacing.sm,
   },
   qrisCard: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.lg,
     ...THEME.shadow.card,
   },
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
     marginBottom: THEME.spacing.md,
     paddingBottom: THEME.spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
   },
   qrisLogo: {
     fontSize: 18,
@@ -179,14 +182,14 @@ const styles = StyleSheet.create({
   qrisMerchant: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   qrCodeBox: {
     width: 200,
     height: 200,
     backgroundColor: '#ffffff',
     borderWidth: 2,
-    borderColor: THEME.colors.text,
+    borderColor: colors.text,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
@@ -212,7 +215,7 @@ const styles = StyleSheet.create({
     left: 8,
     width: 28,
     height: 28,
-    backgroundColor: THEME.colors.text,
+    backgroundColor: colors.text,
     borderRadius: 4,
   },
   qrCornerTopRight: {
@@ -221,7 +224,7 @@ const styles = StyleSheet.create({
     right: 8,
     width: 28,
     height: 28,
-    backgroundColor: THEME.colors.text,
+    backgroundColor: colors.text,
     borderRadius: 4,
   },
   qrCornerBottomLeft: {
@@ -230,7 +233,7 @@ const styles = StyleSheet.create({
     left: 8,
     width: 28,
     height: 28,
-    backgroundColor: THEME.colors.text,
+    backgroundColor: colors.text,
     borderRadius: 4,
   },
   qrIcon: {
@@ -238,13 +241,13 @@ const styles = StyleSheet.create({
   },
   qrHint: {
     fontSize: 10,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontFamily: 'monospace',
   },
   qrAmountBadge: {
     marginTop: 6,
-    backgroundColor: THEME.colors.primarySoft,
-    color: THEME.colors.primaryDark,
+    backgroundColor: colors.primarySoft,
+    color: colors.primaryDark,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -253,17 +256,17 @@ const styles = StyleSheet.create({
   },
   scanInstruction: {
     fontSize: 12,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     marginTop: THEME.spacing.sm,
     lineHeight: 16,
   },
   proofSection: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     ...THEME.shadow.card,
   },
   proofHeader: {
@@ -275,7 +278,7 @@ const styles = StyleSheet.create({
   proofLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
@@ -283,31 +286,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
   },
   verifiedText: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
     fontSize: 11,
     fontWeight: '700',
   },
   requiredText: {
-    color: THEME.colors.danger,
+    color: colors.danger,
     fontSize: 11,
     fontWeight: '600',
   },
   takePhotoBtn: {
     borderWidth: 2,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     borderStyle: 'dashed',
     borderRadius: THEME.borderRadius.lg,
     paddingVertical: 24,
     paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   cameraIcon: {
     marginBottom: 6,
@@ -315,11 +318,11 @@ const styles = StyleSheet.create({
   takePhotoText: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.colors.primary,
+    color: colors.primary,
   },
   takePhotoHint: {
     fontSize: 11,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     textAlign: 'center',
     marginTop: 4,
   },
@@ -327,7 +330,7 @@ const styles = StyleSheet.create({
     borderRadius: THEME.borderRadius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   previewImage: {
     width: '100%',
@@ -339,19 +342,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: THEME.spacing.sm,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
   },
   retakeBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,
   },
   retakeBtnText: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -360,7 +363,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   deleteProofText: {
-    color: THEME.colors.danger,
+    color: colors.danger,
     fontSize: 12,
     fontWeight: '600',
   },

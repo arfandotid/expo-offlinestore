@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,23 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, Stack } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
-import { ImagePlus, QrCode, Trash2, Save } from 'lucide-react-native';
+import { ImagePlus, QrCode, Trash2, Save, Sun, Moon, Monitor } from 'lucide-react-native';
 import { settingsRepository } from '../src/db/settingsRepository';
 import { THEME } from '../src/constants/theme';
+import { useTheme } from '../src/theme/ThemeProvider';
+
+const THEME_OPTIONS = [
+  { key: 'light', icon: Sun, label: 'Terang' },
+  { key: 'dark', icon: Moon, label: 'Gelap' },
+  { key: 'system', icon: Monitor, label: 'Sistem' },
+];
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const { mode: themeMode, setMode: setThemeMode, colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [appName, setAppName] = useState('');
   const [logoUri, setLogoUri] = useState('');
@@ -90,10 +99,24 @@ export default function SettingsScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.keyboardView}
-    >
+    <>
+      <Stack.Screen
+        options={{
+          headerStyle: {
+            backgroundColor: colors.surface,
+          },
+          headerTitleStyle: {
+            fontWeight: '700',
+            fontSize: 17,
+            color: colors.text,
+          },
+          headerTintColor: colors.primary,
+        }}
+      />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardView}
+      >
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -106,13 +129,39 @@ export default function SettingsScreen() {
           <TextInput
             style={styles.textInput}
             placeholder="Contoh: POS TOKO OFFLINE"
-            placeholderTextColor={THEME.colors.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={appName}
             onChangeText={setAppName}
           />
           <Text style={styles.fieldHint}>
             Nama ini akan tampil pada struk pembayaran dan kartu QRIS.
           </Text>
+        </View>
+
+        {/* Tema Aplikasi */}
+        <View style={styles.themeSection}>
+          <Text style={styles.fieldLabel}>Tema Aplikasi</Text>
+          <Text style={styles.fieldHint}>
+            Pilih tampilan terang, gelap, atau ikuti tema sistem perangkat.
+          </Text>
+          <View style={styles.themeRow}>
+            {THEME_OPTIONS.map(({ key, icon: Icon, label }) => {
+              const isActive = themeMode === key;
+              return (
+                <TouchableOpacity
+                  key={key}
+                  onPress={() => setThemeMode(key)}
+                  activeOpacity={0.8}
+                  style={[styles.themeBtn, isActive && styles.themeBtnActive]}
+                >
+                  <Icon size={16} color={isActive ? '#ffffff' : colors.textSecondary} />
+                  <Text style={[styles.themeBtnText, isActive && styles.themeBtnTextActive]}>
+                    {label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
 
         {/* Logo Aplikasi */}
@@ -128,7 +177,7 @@ export default function SettingsScreen() {
               <Image source={{ uri: logoUri }} style={styles.previewImage} resizeMode="contain" />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <ImagePlus size={28} color={THEME.colors.primary} style={styles.placeholderIcon} />
+                <ImagePlus size={28} color={colors.primary} style={styles.placeholderIcon} />
                 <Text style={styles.photoLabel}>Pilih Logo</Text>
                 <Text style={styles.photoSubLabel}>Dari Galeri</Text>
               </View>
@@ -136,7 +185,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           {logoUri ? (
             <TouchableOpacity onPress={() => setLogoUri('')} style={styles.deletePhotoBtn}>
-              <Trash2 size={12} color={THEME.colors.danger} />
+              <Trash2 size={12} color={colors.danger} />
               <Text style={styles.deletePhotoText}>Hapus Logo</Text>
             </TouchableOpacity>
           ) : null}
@@ -157,7 +206,7 @@ export default function SettingsScreen() {
               <Image source={{ uri: qrisUri }} style={styles.previewImage} resizeMode="contain" />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <QrCode size={28} color={THEME.colors.primary} style={styles.placeholderIcon} />
+                <QrCode size={28} color={colors.primary} style={styles.placeholderIcon} />
                 <Text style={styles.photoLabel}>Pilih QRIS</Text>
                 <Text style={styles.photoSubLabel}>Dari Galeri</Text>
               </View>
@@ -165,7 +214,7 @@ export default function SettingsScreen() {
           </TouchableOpacity>
           {qrisUri ? (
             <TouchableOpacity onPress={() => setQrisUri('')} style={styles.deletePhotoBtn}>
-              <Trash2 size={12} color={THEME.colors.danger} />
+              <Trash2 size={12} color={colors.danger} />
               <Text style={styles.deletePhotoText}>Hapus QRIS</Text>
             </TouchableOpacity>
           ) : null}
@@ -190,14 +239,15 @@ export default function SettingsScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: THEME.spacing.lg,
@@ -209,28 +259,60 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 6,
   },
   requiredAsterisk: {
-    color: THEME.colors.danger,
+    color: colors.danger,
   },
   fieldHint: {
     fontSize: 11,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginBottom: 8,
     marginTop: -2,
   },
-  textInput: {
-    backgroundColor: THEME.colors.surface,
+  themeSection: {
+    marginBottom: THEME.spacing.xxl,
+  },
+  themeRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  themeBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: THEME.borderRadius.lg,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
+  },
+  themeBtnActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  themeBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  themeBtnTextActive: {
+    color: '#ffffff',
+    fontWeight: '700',
+  },
+  textInput: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: THEME.spacing.md,
-    color: THEME.colors.text,
+    color: colors.text,
     fontSize: 14,
     fontWeight: '500',
     ...THEME.shadow.card,
@@ -242,9 +324,9 @@ const styles = StyleSheet.create({
     width: 180,
     height: 180,
     borderRadius: THEME.borderRadius.xl,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -266,11 +348,11 @@ const styles = StyleSheet.create({
   photoLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primary,
+    color: colors.primary,
   },
   photoSubLabel: {
     fontSize: 10,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: 2,
   },
   deletePhotoBtn: {
@@ -282,7 +364,7 @@ const styles = StyleSheet.create({
   },
   deletePhotoText: {
     fontSize: 12,
-    color: THEME.colors.danger,
+    color: colors.danger,
     fontWeight: '600',
   },
   actionContainer: {
@@ -293,7 +375,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: THEME.borderRadius.lg,
     paddingVertical: 14,
     ...THEME.shadow.card,

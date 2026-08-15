@@ -7,6 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { X, CircleCheckBig, Banknote, TriangleAlert } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
@@ -15,6 +16,9 @@ export default function CashPayment({
   cashAmount,
   onChangeCashAmount,
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   // Hitung saran pecahan uang cepat
   const quickSuggestions = useMemo(() => {
     const suggestions = [];
@@ -57,7 +61,7 @@ export default function CashPayment({
           <TextInput
             style={styles.textInput}
             placeholder="0"
-            placeholderTextColor={THEME.colors.textMuted}
+            placeholderTextColor={colors.textMuted}
             keyboardType="numeric"
             value={cashAmount ? cashAmount.toString() : ''}
             onChangeText={(text) => onChangeCashAmount(text.replace(/[^0-9]/g, ''))}
@@ -68,7 +72,7 @@ export default function CashPayment({
               onPress={() => onChangeCashAmount('')}
               style={styles.clearBtn}
             >
-              <X size={14} color={THEME.colors.textMuted} />
+              <X size={14} color={colors.textMuted} />
             </TouchableOpacity>
           ) : null}
         </View>
@@ -126,19 +130,19 @@ export default function CashPayment({
         </View>
         {isEnough ? (
           change === 0 ? (
-            <CircleCheckBig size={28} color={THEME.colors.primaryDark} style={styles.changeStatusIcon} />
+            <CircleCheckBig size={28} color={colors.primaryDark} style={styles.changeStatusIcon} />
           ) : (
-            <Banknote size={28} color={THEME.colors.primaryDark} style={styles.changeStatusIcon} />
+            <Banknote size={28} color={colors.primaryDark} style={styles.changeStatusIcon} />
           )
         ) : (
-          <TriangleAlert size={28} color={THEME.colors.dangerDark} style={styles.changeStatusIcon} />
+          <TriangleAlert size={28} color={colors.dangerDark} style={styles.changeStatusIcon} />
         )}
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     paddingVertical: THEME.spacing.sm,
   },
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 8,
@@ -156,10 +160,10 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.lg,
     borderWidth: 1.5,
-    borderColor: THEME.colors.primary,
+    borderColor: colors.primary,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: 14,
     ...THEME.shadow.card,
@@ -167,14 +171,14 @@ const styles = StyleSheet.create({
   currencyPrefix: {
     fontSize: 18,
     fontWeight: '800',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginRight: 8,
   },
   textInput: {
     flex: 1,
     fontSize: 22,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
     padding: 0,
   },
   clearBtn: {
@@ -186,7 +190,7 @@ const styles = StyleSheet.create({
   suggestionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
   },
   chipsContainer: {
@@ -195,22 +199,22 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
     borderRadius: THEME.borderRadius.md,
     ...THEME.shadow.card,
   },
   chipSelected: {
-    backgroundColor: THEME.colors.primary,
-    borderColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   chipText: {
     fontSize: 13,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   chipTextSelected: {
     color: '#ffffff',
@@ -224,12 +228,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   changeBoxSuccess: {
-    backgroundColor: THEME.colors.primarySoft,
-    borderColor: THEME.colors.primaryLight,
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primaryLight,
   },
   changeBoxWarning: {
-    backgroundColor: THEME.colors.dangerLight,
-    borderColor: '#fca5a5',
+    backgroundColor: colors.dangerLight,
+    borderColor: colors.dangerDark,
   },
   changeInfo: {
     flex: 1,
@@ -237,7 +241,7 @@ const styles = StyleSheet.create({
   changeTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     marginBottom: 2,
   },
@@ -246,10 +250,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   changeAmountSuccess: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   changeAmountWarning: {
-    color: THEME.colors.dangerDark,
+    color: colors.dangerDark,
   },
   changeStatusIcon: {
     marginLeft: 12,

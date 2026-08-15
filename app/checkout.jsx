@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Banknote, Smartphone, Check } from 'lucide-react-native';
 import { THEME } from '../src/constants/theme';
+import { useTheme } from '../src/theme/ThemeProvider';
 import { formatRupiah } from '../src/components/ProductCard';
 import CashPayment from '../src/components/CashPayment';
 import QrisPayment from '../src/components/QrisPayment';
@@ -21,6 +22,8 @@ import { transactionRepository } from '../src/db/transactionRepository';
 export default function CheckoutScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const totalPrice = parseFloat(params?.totalPrice) || 0;
   const totalItems = parseInt(params?.totalItems, 10) || 0;
@@ -122,7 +125,7 @@ export default function CheckoutScreen() {
           >
             <Banknote
               size={16}
-              color={paymentMethod === 'TUNAI' ? '#ffffff' : THEME.colors.textSecondary}
+              color={paymentMethod === 'TUNAI' ? '#ffffff' : colors.textSecondary}
             />
             <Text
               style={[
@@ -144,7 +147,7 @@ export default function CheckoutScreen() {
           >
             <Smartphone
               size={16}
-              color={paymentMethod === 'QRIS' ? '#ffffff' : THEME.colors.textSecondary}
+              color={paymentMethod === 'QRIS' ? '#ffffff' : colors.textSecondary}
             />
             <Text
               style={[
@@ -185,7 +188,7 @@ export default function CheckoutScreen() {
             <View style={styles.completeBtnContent}>
               <Check
                 size={16}
-                color={canComplete ? '#ffffff' : THEME.colors.textMuted}
+                color={canComplete ? '#ffffff' : colors.textMuted}
               />
               <Text
                 style={[
@@ -203,17 +206,17 @@ export default function CheckoutScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: THEME.spacing.lg,
     paddingBottom: 40,
   },
   totalCard: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.xl,
     marginBottom: THEME.spacing.lg,
@@ -237,17 +240,17 @@ const styles = StyleSheet.create({
     marginVertical: 4,
   },
   itemCountText: {
-    color: THEME.colors.primaryLight,
+    color: colors.primaryLight,
     fontSize: 13,
     fontWeight: '600',
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     padding: 4,
     borderRadius: THEME.borderRadius.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.lg,
     ...THEME.shadow.card,
   },
@@ -261,12 +264,12 @@ const styles = StyleSheet.create({
     borderRadius: THEME.borderRadius.md,
   },
   tabBtnActive: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   tabTextActive: {
     color: '#ffffff',
@@ -275,7 +278,7 @@ const styles = StyleSheet.create({
     marginTop: THEME.spacing.xl,
   },
   completeBtn: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: THEME.borderRadius.lg,
     alignItems: 'center',
@@ -283,7 +286,7 @@ const styles = StyleSheet.create({
     ...THEME.shadow.card,
   },
   completeBtnDisabled: {
-    backgroundColor: THEME.colors.border,
+    backgroundColor: colors.border,
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -298,6 +301,6 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   completeBtnTextDisabled: {
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
   },
 });

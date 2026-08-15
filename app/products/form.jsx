@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -16,12 +16,15 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImagePlus, Barcode, Trash2 } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 
 const QUICK_CATEGORIES = ['Makanan', 'Minuman', 'Snack', 'Sembako', 'Rokok', 'Lainnya'];
 
 export default function ProductFormScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const isEditing = Boolean(params?.id);
 
   const [nama, setNama] = useState(params?.nama || '');
@@ -141,7 +144,7 @@ export default function ProductFormScreen() {
               <Image source={{ uri: foto }} style={styles.previewImage} resizeMode="cover" />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <ImagePlus size={28} color={THEME.colors.primary} style={styles.cameraIcon} />
+                <ImagePlus size={28} color={colors.primary} style={styles.cameraIcon} />
                 <Text style={styles.photoLabel}>Pilih Foto</Text>
                 <Text style={styles.photoSubLabel}>Dari Galeri</Text>
               </View>
@@ -149,7 +152,7 @@ export default function ProductFormScreen() {
           </TouchableOpacity>
           {foto ? (
             <TouchableOpacity onPress={() => setFoto('')} style={styles.deletePhotoBtn}>
-              <Trash2 size={12} color={THEME.colors.danger} />
+              <Trash2 size={12} color={colors.danger} />
               <Text style={styles.deletePhotoText}>Hapus Foto</Text>
             </TouchableOpacity>
           ) : null}
@@ -163,7 +166,7 @@ export default function ProductFormScreen() {
           <TextInput
             style={styles.textInput}
             placeholder="Contoh: Kopi Susu Aren 250ml"
-            placeholderTextColor={THEME.colors.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={nama}
             onChangeText={setNama}
           />
@@ -175,7 +178,7 @@ export default function ProductFormScreen() {
           <TextInput
             style={styles.textInput}
             placeholder="Contoh: Minuman"
-            placeholderTextColor={THEME.colors.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={kategori}
             onChangeText={setKategori}
           />
@@ -208,7 +211,7 @@ export default function ProductFormScreen() {
             <TextInput
               style={styles.priceInput}
               placeholder="0"
-              placeholderTextColor={THEME.colors.textMuted}
+              placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
               value={harga}
               onChangeText={setHarga}
@@ -223,7 +226,7 @@ export default function ProductFormScreen() {
             <TextInput
               style={[styles.textInput, styles.barcodeInput]}
               placeholder="Scan atau ketik barcode"
-              placeholderTextColor={THEME.colors.textMuted}
+              placeholderTextColor={colors.textMuted}
               value={barcode}
               onChangeText={setBarcode}
             />
@@ -232,7 +235,7 @@ export default function ProductFormScreen() {
               activeOpacity={0.8}
               style={styles.scanButton}
             >
-              <Barcode size={14} color={THEME.colors.primaryDark} />
+              <Barcode size={14} color={colors.primaryDark} />
               <Text style={styles.scanButtonText}>Scan</Text>
             </TouchableOpacity>
           </View>
@@ -264,10 +267,10 @@ export default function ProductFormScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   keyboardView: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: THEME.spacing.lg,
@@ -281,9 +284,9 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: THEME.borderRadius.xl,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     borderStyle: 'dashed',
     alignItems: 'center',
     justifyContent: 'center',
@@ -304,11 +307,11 @@ const styles = StyleSheet.create({
   photoLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primary,
+    color: colors.primary,
   },
   photoSubLabel: {
     fontSize: 10,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: 2,
   },
   deletePhotoBtn: {
@@ -319,7 +322,7 @@ const styles = StyleSheet.create({
   },
   deletePhotoText: {
     fontSize: 12,
-    color: THEME.colors.danger,
+    color: colors.danger,
     fontWeight: '600',
   },
   fieldGroup: {
@@ -328,22 +331,22 @@ const styles = StyleSheet.create({
   fieldLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 6,
   },
   requiredAsterisk: {
-    color: THEME.colors.danger,
+    color: colors.danger,
   },
   textInput: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: THEME.spacing.md,
-    color: THEME.colors.text,
+    color: colors.text,
     fontSize: 14,
     fontWeight: '500',
     ...THEME.shadow.card,
@@ -358,18 +361,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   chipSelected: {
-    backgroundColor: THEME.colors.primary,
-    borderColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   chipText: {
     fontSize: 12,
     fontWeight: '500',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   chipTextSelected: {
     color: '#ffffff',
@@ -378,9 +381,9 @@ const styles = StyleSheet.create({
   priceInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: THEME.spacing.md,
@@ -389,12 +392,12 @@ const styles = StyleSheet.create({
   currencyPrefix: {
     fontSize: 15,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginRight: 8,
   },
   priceInput: {
     flex: 1,
-    color: THEME.colors.text,
+    color: colors.text,
     fontSize: 16,
     fontWeight: '700',
     padding: 0,
@@ -411,9 +414,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: 14,
     paddingVertical: 12,
@@ -423,14 +426,14 @@ const styles = StyleSheet.create({
   scanButtonText: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   actionContainer: {
     marginTop: THEME.spacing.xxl,
     gap: 12,
   },
   saveButton: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: THEME.borderRadius.lg,
     paddingVertical: 14,
     alignItems: 'center',
@@ -442,13 +445,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   cancelButton: {
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: colors.borderLight,
     borderRadius: THEME.borderRadius.lg,
     paddingVertical: 14,
     alignItems: 'center',
   },
   cancelButtonText: {
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: '600',
     fontSize: 14,
   },

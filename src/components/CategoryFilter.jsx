@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 
 /**
  * Baris chip filter kategori (horizontal, scrollable).
  * Props: categories (string[]), selected (string | null), onSelect (fn)
  */
 export default function CategoryFilter({ categories = [], selected = null, onSelect }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const chips = [{ key: null, label: 'Semua' }, ...categories.map((c) => ({ key: c, label: c }))];
 
   return (
@@ -34,7 +37,7 @@ export default function CategoryFilter({ categories = [], selected = null, onSel
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     paddingHorizontal: THEME.spacing.lg,
     gap: THEME.spacing.sm,
@@ -43,19 +46,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: THEME.borderRadius.full,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     maxWidth: 160,
   },
   chipActive: {
-    backgroundColor: THEME.colors.primary,
-    borderColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   chipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   chipTextActive: {
     color: '#ffffff',

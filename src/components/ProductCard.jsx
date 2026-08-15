@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Package, Pencil, Trash2 } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 
 /**
  * Format angka ke format mata uang Rupiah
@@ -17,6 +18,8 @@ export function formatRupiah(amount) {
 }
 
 export default function ProductCard({ product, onEdit, onDelete }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { nama, kategori, harga, foto, barcode } = product;
 
   return (
@@ -26,7 +29,7 @@ export default function ProductCard({ product, onEdit, onDelete }) {
         {foto ? (
           <Image source={{ uri: foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Package size={28} color={THEME.colors.textMuted} />
+          <Package size={28} color={colors.textMuted} />
         )}
       </View>
 
@@ -58,28 +61,28 @@ export default function ProductCard({ product, onEdit, onDelete }) {
           activeOpacity={0.7}
           style={styles.editButton}
         >
-          <Pencil size={14} color={THEME.colors.textSecondary} />
+          <Pencil size={14} color={colors.textSecondary} />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => onDelete(product)}
           activeOpacity={0.7}
           style={styles.deleteButton}
         >
-          <Trash2 size={14} color={THEME.colors.dangerDark} />
+          <Trash2 size={14} color={colors.dangerDark} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.lg,
     padding: THEME.spacing.md,
     marginBottom: THEME.spacing.md,
     borderWidth: 1,
-    borderColor: THEME.colors.borderLight,
+    borderColor: colors.borderLight,
     flexDirection: 'row',
     alignItems: 'center',
     ...THEME.shadow.card,
@@ -88,12 +91,12 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: THEME.borderRadius.md,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     overflow: 'hidden',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   image: {
     width: '100%',
@@ -112,36 +115,36 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   categoryBadge: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
   },
   categoryText: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
     fontSize: 10,
     fontWeight: '700',
     textTransform: 'uppercase',
   },
   barcodeBadge: {
-    backgroundColor: THEME.colors.badgeBg,
+    backgroundColor: colors.badgeBg,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 6,
   },
   barcodeText: {
-    color: THEME.colors.badgeText,
+    color: colors.badgeText,
     fontSize: 10,
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   productName: {
-    color: THEME.colors.text,
+    color: colors.text,
     fontWeight: '700',
     fontSize: 15,
     marginBottom: 2,
   },
   productPrice: {
-    color: THEME.colors.primary,
+    color: colors.primary,
     fontWeight: '800',
     fontSize: 14,
   },
@@ -154,17 +157,17 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   deleteButton: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: THEME.colors.dangerLight,
+    backgroundColor: colors.dangerLight,
     alignItems: 'center',
     justifyContent: 'center',
   },

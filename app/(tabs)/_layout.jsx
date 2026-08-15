@@ -4,9 +4,11 @@ import { Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ShoppingCart, Package, Receipt } from 'lucide-react-native';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const bottomInset = Platform.OS === 'android' ? insets.bottom : 0;
 
   return (
@@ -14,27 +16,27 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: true,
         headerStyle: {
-          backgroundColor: THEME.colors.surface,
+          backgroundColor: colors.surface,
           elevation: 0,
           shadowOpacity: 0,
           borderBottomWidth: 1,
-          borderBottomColor: THEME.colors.borderLight,
+          borderBottomColor: colors.borderLight,
         },
         headerTitleStyle: {
           fontWeight: '700',
           fontSize: 18,
-          color: THEME.colors.text,
+          color: colors.text,
         },
         tabBarStyle: {
-          backgroundColor: THEME.colors.surface,
-          borderTopColor: THEME.colors.border,
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
           height: (Platform.OS === 'ios' ? 88 : 64) + bottomInset,
           paddingBottom: (Platform.OS === 'ios' ? 28 : 10) + bottomInset,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: THEME.colors.primary,
-        tabBarInactiveTintColor: THEME.colors.textSecondary,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',

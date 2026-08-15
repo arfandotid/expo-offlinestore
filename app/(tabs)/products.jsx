@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -18,9 +18,12 @@ import EmptyState from '../../src/components/EmptyState';
 import CategoryFilter from '../../src/components/CategoryFilter';
 import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 
 export default function ProductsScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -131,9 +134,9 @@ export default function ProductsScreen() {
                 hitSlop={8}
               >
                 {searchVisible ? (
-                  <X size={22} color={THEME.colors.text} />
+                  <X size={22} color={colors.text} />
                 ) : (
-                  <Search size={22} color={THEME.colors.text} />
+                  <Search size={22} color={colors.text} />
                 )}
               </TouchableOpacity>
             </HeaderActions>
@@ -145,11 +148,11 @@ export default function ProductsScreen() {
       <View style={styles.searchHeader}>
         {searchVisible && (
           <View style={styles.searchInputWrapper}>
-            <Search size={16} color={THEME.colors.textMuted} style={styles.searchIcon} />
+            <Search size={16} color={colors.textMuted} style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
               placeholder="Cari nama produk atau barcode..."
-              placeholderTextColor={THEME.colors.textMuted}
+              placeholderTextColor={colors.textMuted}
               value={searchQuery}
               onChangeText={(text) => setSearchQuery(text)}
               clearButtonMode="while-editing"
@@ -157,7 +160,7 @@ export default function ProductsScreen() {
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-                <X size={14} color={THEME.colors.textMuted} />
+                <X size={14} color={colors.textMuted} />
               </TouchableOpacity>
             )}
           </View>
@@ -176,7 +179,7 @@ export default function ProductsScreen() {
       {/* Main List Area */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={THEME.colors.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Memuat data produk...</Text>
         </View>
       ) : (
@@ -188,7 +191,7 @@ export default function ProductsScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={[THEME.colors.primary]}
+              colors={[colors.primary]}
             />
           }
           renderItem={({ item }) => (
@@ -201,7 +204,7 @@ export default function ProductsScreen() {
           ListEmptyComponent={
             <EmptyState
               icon={
-                <Search size={36} color={THEME.colors.primary} />
+                <Search size={36} color={colors.primary} />
               }
               title={
                 selectedCategory && !searchQuery
@@ -255,18 +258,18 @@ export default function ProductsScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   searchHeader: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     paddingHorizontal: THEME.spacing.lg,
     paddingTop: THEME.spacing.md,
     paddingBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
     ...THEME.shadow.card,
   },
   headerActionBtn: {
@@ -275,20 +278,20 @@ const styles = StyleSheet.create({
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.md,
     paddingVertical: THEME.spacing.sm,
     marginBottom: THEME.spacing.md,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   searchIcon: {
     marginRight: THEME.spacing.sm,
   },
   searchInput: {
     flex: 1,
-    color: THEME.colors.text,
+    color: colors.text,
     fontSize: 14,
     padding: 0,
   },
@@ -305,7 +308,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: THEME.spacing.sm,
   },
   listContent: {
@@ -320,7 +323,7 @@ const styles = StyleSheet.create({
   fab: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderRadius: THEME.borderRadius.full,

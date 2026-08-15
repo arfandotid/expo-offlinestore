@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,13 @@ import {
   StyleSheet,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { Package, Minus, Plus } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
 export default function CartItem({ item, onUpdateQty, onRemove }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { product, qty } = item;
   const [isEditingQty, setIsEditingQty] = useState(false);
   const [customQty, setCustomQty] = useState(qty.toString());
@@ -35,7 +38,7 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
         {product.foto ? (
           <Image source={{ uri: product.foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Package size={20} color={THEME.colors.textMuted} />
+          <Package size={20} color={colors.textMuted} />
         )}
       </View>
 
@@ -59,7 +62,7 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
           onPress={() => onUpdateQty(product.id, qty - 1)}
           style={styles.stepBtn}
         >
-          <Minus size={16} color={THEME.colors.textSecondary} strokeWidth={2.5} />
+          <Minus size={16} color={colors.textSecondary} strokeWidth={2.5} />
         </TouchableOpacity>
 
         {isEditingQty ? (
@@ -91,35 +94,35 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
           onPress={() => onUpdateQty(product.id, qty + 1)}
           style={[styles.stepBtn, styles.stepBtnAdd]}
         >
-          <Plus size={16} color={THEME.colors.primaryDark} strokeWidth={2.5} />
+          <Plus size={16} color={colors.primaryDark} strokeWidth={2.5} />
         </TouchableOpacity>
       </View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     paddingVertical: THEME.spacing.md,
     paddingHorizontal: THEME.spacing.md,
     borderRadius: THEME.borderRadius.lg,
     marginBottom: THEME.spacing.sm,
     borderWidth: 1,
-    borderColor: THEME.colors.borderLight,
+    borderColor: colors.borderLight,
   },
   imageContainer: {
     width: 48,
     height: 48,
     borderRadius: THEME.borderRadius.md,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   image: {
     width: '100%',
@@ -133,26 +136,26 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     marginBottom: 2,
   },
   unitPriceText: {
     fontSize: 11,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   subtotalText: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primary,
+    color: colors.primary,
     marginTop: 2,
   },
   qtyController: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     borderRadius: THEME.borderRadius.md,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     overflow: 'hidden',
   },
   stepBtn: {
@@ -160,10 +163,10 @@ const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
   },
   stepBtnAdd: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
   },
   qtyDisplay: {
     minWidth: 32,
@@ -175,7 +178,7 @@ const styles = StyleSheet.create({
   qtyText: {
     fontSize: 13,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   qtyInput: {
     minWidth: 32,
@@ -183,8 +186,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 13,
     fontWeight: '800',
-    color: THEME.colors.text,
-    backgroundColor: '#ffffff',
+    color: colors.text,
+    backgroundColor: colors.surface,
     padding: 0,
   },
 });

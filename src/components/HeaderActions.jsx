@@ -3,6 +3,7 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Settings as SettingsIcon } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 
 /**
  * Aksi di sisi kanan navbar tab.
@@ -11,6 +12,7 @@ import { THEME } from '../constants/theme';
  */
 export default function HeaderActions({ children }) {
   const router = useRouter();
+  const { colors } = useTheme();
 
   return (
     <View style={styles.container}>
@@ -20,7 +22,7 @@ export default function HeaderActions({ children }) {
         style={styles.actionBtn}
         hitSlop={8}
       >
-        <SettingsIcon size={22} color={THEME.colors.text} />
+        <SettingsIcon size={22} color={colors.text} />
       </TouchableOpacity>
     </View>
   );

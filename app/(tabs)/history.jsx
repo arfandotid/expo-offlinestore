@@ -14,10 +14,13 @@ import TransactionCard from '../../src/components/TransactionCard';
 import EmptyState from '../../src/components/EmptyState';
 import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 import { formatRupiah } from '../../src/components/ProductCard';
 
 export default function HistoryScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -81,7 +84,7 @@ export default function HistoryScreen() {
       {/* List Riwayat Transaksi */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={THEME.colors.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Memuat riwayat transaksi...</Text>
         </View>
       ) : (
@@ -93,7 +96,7 @@ export default function HistoryScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              colors={[THEME.colors.primary]}
+              colors={[colors.primary]}
             />
           }
           renderItem={({ item }) => (
@@ -104,7 +107,7 @@ export default function HistoryScreen() {
           )}
           ListEmptyComponent={
             <EmptyState
-              icon={<ScrollText size={36} color={THEME.colors.primary} />}
+              icon={<ScrollText size={36} color={colors.primary} />}
               title="Belum Ada Transaksi"
               subtitle="Semua transaksi penjualan kasir yang telah diselesaikan akan tercatat rapi di sini."
               actionText="Mulai Penjualan Baru"
@@ -117,17 +120,17 @@ export default function HistoryScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   headerCard: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
     ...THEME.shadow.card,
   },
   omzetRow: {
@@ -138,18 +141,18 @@ const styles = StyleSheet.create({
   omzetLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   omzetValue: {
     fontSize: 22,
     fontWeight: '900',
-    color: THEME.colors.primary,
+    color: colors.primary,
     marginTop: 2,
   },
   trxBadge: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
@@ -157,7 +160,7 @@ const styles = StyleSheet.create({
   trxBadgeText: {
     fontSize: 12,
     fontWeight: '800',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   loadingContainer: {
     flex: 1,
@@ -166,7 +169,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: THEME.spacing.sm,
   },
   listContent: {

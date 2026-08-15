@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Platform,
 } from 'react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { ChevronUp, ChevronDown, ArrowRight } from 'lucide-react-native';
 import { formatRupiah } from './ProductCard';
 
@@ -17,6 +18,9 @@ export default function CartSummary({
   isExpanded,
   onCheckout,
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   if (totalItems === 0) {
     return null;
   }
@@ -39,9 +43,9 @@ export default function CartSummary({
                 {isExpanded ? 'Tutup Detail' : 'Lihat Keranjang'}
               </Text>
               {isExpanded ? (
-                <ChevronDown size={12} color={THEME.colors.textSecondary} />
+                <ChevronDown size={12} color={colors.textSecondary} />
               ) : (
-                <ChevronUp size={12} color={THEME.colors.textSecondary} />
+                <ChevronUp size={12} color={colors.textSecondary} />
               )}
             </View>
           </View>
@@ -62,11 +66,11 @@ export default function CartSummary({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderTopWidth: 1,
-    borderTopColor: THEME.colors.border,
+    borderTopColor: colors.border,
     paddingHorizontal: THEME.spacing.lg,
     paddingTop: THEME.spacing.md,
     paddingBottom: Platform.OS === 'ios' ? 24 : THEME.spacing.md,
@@ -88,13 +92,13 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   countBadge: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 6,
   },
   countBadgeText: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -104,19 +108,19 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   expandLabel: {
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '600',
   },
   totalPriceText: {
     fontSize: 18,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   checkoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: THEME.borderRadius.lg,

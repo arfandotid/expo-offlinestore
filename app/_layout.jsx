@@ -5,6 +5,7 @@ import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { initDatabase } from '../src/db/database';
 import { THEME } from '../src/constants/theme';
+import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 
 export default function RootLayout() {
   const [dbReady, setDbReady] = useState(false);
@@ -44,11 +45,36 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar style="dark" />
+      <ThemeProvider>
+        <AppNavigator />
+      </ThemeProvider>
+    </SafeAreaProvider>
+  );
+}
+
+function AppNavigator() {
+  const { colors, isDark } = useTheme();
+
+  const headerOptions = {
+    headerStyle: {
+      backgroundColor: colors.surface,
+    },
+    headerTitleStyle: {
+      fontWeight: '700',
+      fontSize: 17,
+      color: colors.text,
+    },
+    headerTintColor: colors.primary,
+  };
+
+  return (
+    <>
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: THEME.colors.background },
+          contentStyle: { backgroundColor: colors.background },
+          ...headerOptions,
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -59,13 +85,6 @@ export default function RootLayout() {
             title: 'Form Produk',
             headerBackTitle: 'Kembali',
             presentation: 'modal',
-            headerStyle: { backgroundColor: THEME.colors.surface },
-            headerTitleStyle: {
-              fontWeight: '700',
-              fontSize: 17,
-              color: THEME.colors.text,
-            },
-            headerTintColor: THEME.colors.primary,
           }}
         />
         <Stack.Screen
@@ -74,17 +93,12 @@ export default function RootLayout() {
             headerShown: false,
           }}
         />
-        <Stack.Screen name="checkout" options={{
+        <Stack.Screen
+          name="checkout"
+          options={{
             headerShown: true,
             title: 'Pembayaran',
             headerBackTitle: 'Kasir',
-            headerStyle: { backgroundColor: THEME.colors.surface },
-            headerTitleStyle: {
-              fontWeight: '700',
-              fontSize: 17,
-              color: THEME.colors.text,
-            },
-            headerTintColor: THEME.colors.primary,
           }}
         />
         <Stack.Screen
@@ -93,13 +107,6 @@ export default function RootLayout() {
             headerShown: true,
             title: 'Pengaturan',
             headerBackTitle: 'Kembali',
-            headerStyle: { backgroundColor: THEME.colors.surface },
-            headerTitleStyle: {
-              fontWeight: '700',
-              fontSize: 17,
-              color: THEME.colors.text,
-            },
-            headerTintColor: THEME.colors.primary,
           }}
         />
         <Stack.Screen
@@ -115,17 +122,10 @@ export default function RootLayout() {
             headerShown: true,
             title: 'Detail Transaksi',
             headerBackTitle: 'Riwayat',
-            headerStyle: { backgroundColor: THEME.colors.surface },
-            headerTitleStyle: {
-              fontWeight: '700',
-              fontSize: 17,
-              color: THEME.colors.text,
-            },
-            headerTintColor: THEME.colors.primary,
           }}
         />
       </Stack>
-    </SafeAreaProvider>
+    </>
   );
 }
 

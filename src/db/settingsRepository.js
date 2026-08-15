@@ -7,6 +7,7 @@ export const DEFAULT_SETTINGS = {
   app_name: 'POS TOKO OFFLINE',
   app_logo_uri: '',
   qris_uri: '',
+  theme_mode: 'system',
 };
 
 /**

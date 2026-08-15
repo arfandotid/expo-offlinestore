@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Package } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 
 export default function EmptyState({
-  icon = <Package size={36} color={THEME.colors.primary} />,
+  icon,
   title,
   subtitle,
   actionText,
   onAction,
 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const resolvedIcon = icon ?? <Package size={36} color={colors.primary} />;
+
   return (
     <View style={styles.container}>
-      <View style={styles.iconCircle}>{icon}</View>
+      <View style={styles.iconCircle}>{resolvedIcon}</View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
       {actionText && onAction && (
@@ -28,7 +33,7 @@ export default function EmptyState({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -39,7 +44,7 @@ const styles = StyleSheet.create({
   iconCircle: {
     width: 80,
     height: 80,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     borderRadius: 40,
     alignItems: 'center',
     justifyContent: 'center',
@@ -48,20 +53,20 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     textAlign: 'center',
     marginBottom: THEME.spacing.xs,
   },
   subtitle: {
     fontSize: 14,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 20,
     maxWidth: 280,
     marginBottom: THEME.spacing.xl,
   },
   actionButton: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: THEME.spacing.lg,
     paddingVertical: THEME.spacing.md,
     borderRadius: THEME.borderRadius.lg,

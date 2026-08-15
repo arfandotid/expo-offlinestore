@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TriangleAlert, Printer, Download, Share2, Trash2 } from 'lucide-react-native';
 import { transactionRepository } from '../../src/db/transactionRepository';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 import { formatRupiah } from '../../src/components/ProductCard';
 import {
   shareReceiptPdf,
@@ -39,6 +40,8 @@ export default function TransactionDetailScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -105,7 +108,7 @@ export default function TransactionDetailScreen() {
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={THEME.colors.primary} />
+        <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Memuat detail transaksi...</Text>
       </View>
     );
@@ -114,7 +117,7 @@ export default function TransactionDetailScreen() {
   if (!transaction) {
     return (
       <View style={styles.notFoundContainer}>
-        <TriangleAlert size={48} color={THEME.colors.textSecondary} />
+        <TriangleAlert size={48} color={colors.textSecondary} />
         <Text style={styles.notFoundTitle}>Transaksi Tidak Ditemukan</Text>
         <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
           <Text style={styles.backBtnText}>Kembali ke Riwayat</Text>
@@ -280,7 +283,7 @@ export default function TransactionDetailScreen() {
                   ) : (
                     <Icon
                       size={20}
-                      color={disabled ? THEME.colors.textMuted : THEME.colors.primaryDark}
+                      color={disabled ? colors.textMuted : colors.primaryDark}
                       strokeWidth={2.2}
                     />
                   )}
@@ -300,7 +303,7 @@ export default function TransactionDetailScreen() {
           style={styles.deleteBtn}
         >
           <View style={styles.btnContentRow}>
-            <Trash2 size={18} color={THEME.colors.danger} style={styles.shareBtnIcon} />
+            <Trash2 size={18} color={colors.danger} style={styles.shareBtnIcon} />
             <Text style={styles.deleteBtnText}>Hapus Transaksi</Text>
           </View>
         </TouchableOpacity>
@@ -309,10 +312,10 @@ export default function TransactionDetailScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     padding: THEME.spacing.lg,
@@ -325,7 +328,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: THEME.spacing.sm,
   },
   notFoundContainer: {
@@ -337,12 +340,12 @@ const styles = StyleSheet.create({
   notFoundTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     marginTop: THEME.spacing.md,
     marginBottom: THEME.spacing.md,
   },
   backBtn: {
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: THEME.borderRadius.md,
@@ -352,11 +355,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   headerCard: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.md,
     ...THEME.shadow.card,
   },
@@ -368,13 +371,13 @@ const styles = StyleSheet.create({
   receiptLabel: {
     fontSize: 11,
     fontWeight: '600',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     textTransform: 'uppercase',
   },
   receiptNo: {
     fontSize: 20,
     fontWeight: '900',
-    color: THEME.colors.text,
+    color: colors.text,
     fontFamily: 'monospace',
     marginTop: 2,
   },
@@ -384,45 +387,45 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeCash: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
   },
   badgeQris: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: colors.infoBg,
   },
   methodBadgeText: {
     fontSize: 12,
     fontWeight: '800',
   },
   badgeTextCash: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   badgeTextQris: {
-    color: '#1d4ed8',
+    color: colors.infoText,
   },
   dateText: {
     fontSize: 12,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: THEME.spacing.sm,
   },
   sectionCard: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginBottom: THEME.spacing.md,
     ...THEME.shadow.card,
   },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
   divider: {
     height: 1,
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: colors.borderLight,
     marginVertical: THEME.spacing.md,
   },
   itemRow: {
@@ -438,17 +441,17 @@ const styles = StyleSheet.create({
   itemName: {
     fontSize: 14,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   itemSub: {
     fontSize: 12,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   itemSubtotal: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -458,20 +461,20 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 13,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   summaryValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   summaryValueBold: {
     fontSize: 16,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   changeHighlight: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     marginHorizontal: -THEME.spacing.lg,
     marginBottom: -THEME.spacing.lg,
     marginTop: THEME.spacing.sm,
@@ -483,23 +486,23 @@ const styles = StyleSheet.create({
   changeLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   changeValue: {
     fontSize: 16,
     fontWeight: '900',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   paidStatus: {
     fontSize: 13,
     fontWeight: '800',
-    color: THEME.colors.primary,
+    color: colors.primary,
   },
   proofImageWrapper: {
     borderRadius: THEME.borderRadius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   proofImage: {
     width: '100%',
@@ -509,11 +512,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     paddingVertical: THEME.spacing.lg,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
     marginTop: THEME.spacing.sm,
     marginBottom: THEME.spacing.md,
     ...THEME.shadow.card,
@@ -529,35 +532,35 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
     borderWidth: 1.5,
-    borderColor: THEME.colors.primaryLight,
+    borderColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionIconCircleActive: {
-    backgroundColor: THEME.colors.primary,
-    borderColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   actionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   actionLabelDisabled: {
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
   },
   deleteBtn: {
-    backgroundColor: THEME.colors.dangerLight,
+    backgroundColor: colors.dangerLight,
     borderWidth: 1,
-    borderColor: '#fca5a5',
+    borderColor: colors.dangerDark,
     paddingVertical: 16,
     borderRadius: THEME.borderRadius.lg,
     alignItems: 'center',
     justifyContent: 'center',
   },
   deleteBtnText: {
-    color: THEME.colors.danger,
+    color: colors.danger,
     fontSize: 15,
     fontWeight: '800',
   },

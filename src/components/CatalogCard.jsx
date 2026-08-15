@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Package } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { formatRupiah } from './ProductCard';
 
 export default function CatalogCard({ product, onAddToCart, cartQty = 0 }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { nama, kategori, harga, foto } = product;
 
   return (
@@ -18,7 +21,7 @@ export default function CatalogCard({ product, onAddToCart, cartQty = 0 }) {
         {foto ? (
           <Image source={{ uri: foto }} style={styles.image} resizeMode="cover" />
         ) : (
-          <Package size={36} color={THEME.colors.textMuted} />
+          <Package size={36} color={colors.textMuted} />
         )}
 
         {/* Badge jika sudah di keranjang */}
@@ -47,21 +50,21 @@ export default function CatalogCard({ product, onAddToCart, cartQty = 0 }) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
     width: '48%',
     marginVertical: 6,
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: THEME.colors.borderLight,
+    borderColor: colors.borderLight,
     ...THEME.shadow.card,
   },
   imageContainer: {
     width: '100%',
     height: 110,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     minWidth: 24,
     height: 24,
     borderRadius: 12,
@@ -95,21 +98,21 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 10,
     fontWeight: '700',
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     textTransform: 'uppercase',
     marginBottom: 2,
   },
   nameText: {
     fontSize: 13,
     fontWeight: '700',
-    color: THEME.colors.text,
+    color: colors.text,
     minHeight: 34,
     lineHeight: 17,
   },
   priceText: {
     fontSize: 14,
     fontWeight: '800',
-    color: THEME.colors.primary,
+    color: colors.primary,
     marginTop: 4,
   },
 });

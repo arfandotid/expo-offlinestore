@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
+import { useTheme } from '../theme/ThemeProvider';
 import { formatRupiah } from './ProductCard';
 import { formatTransactionNo } from '../utils/transactionNumber';
 
@@ -21,6 +22,8 @@ function formatSimpleDate(isoString) {
 }
 
 export default function TransactionCard({ transaction, onPress }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { id, tanggal, total_tagihan, metode_bayar, total_items, total_qty } = transaction;
 
   const isQris = metode_bayar === 'QRIS';
@@ -66,21 +69,21 @@ export default function TransactionCard({ transaction, onPress }) {
 
         <View style={styles.arrowButton}>
           <Text style={styles.arrowText}>Detail</Text>
-          <ArrowRight size={12} color={THEME.colors.primaryDark} />
+          <ArrowRight size={12} color={colors.primaryDark} />
         </View>
       </View>
     </TouchableOpacity>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   card: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: THEME.borderRadius.xl,
     padding: THEME.spacing.lg,
     marginBottom: THEME.spacing.md,
     borderWidth: 1,
-    borderColor: THEME.colors.borderLight,
+    borderColor: colors.borderLight,
     ...THEME.shadow.card,
   },
   headerRow: {
@@ -94,12 +97,12 @@ const styles = StyleSheet.create({
   receiptNo: {
     fontSize: 15,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
     fontFamily: 'monospace',
   },
   dateText: {
     fontSize: 12,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   badge: {
@@ -108,10 +111,10 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   badgeCash: {
-    backgroundColor: THEME.colors.primarySoft,
+    backgroundColor: colors.primarySoft,
   },
   badgeQris: {
-    backgroundColor: '#eff6ff',
+    backgroundColor: colors.infoBg,
   },
   badgeText: {
     fontSize: 11,
@@ -119,14 +122,14 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   badgeTextCash: {
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
   badgeTextQris: {
-    color: '#1d4ed8',
+    color: colors.infoText,
   },
   divider: {
     height: 1,
-    backgroundColor: THEME.colors.borderLight,
+    backgroundColor: colors.borderLight,
     marginVertical: THEME.spacing.md,
   },
   footerRow: {
@@ -136,29 +139,29 @@ const styles = StyleSheet.create({
   },
   itemsSummary: {
     fontSize: 11,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
   totalPrice: {
     fontSize: 16,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
     marginTop: 2,
   },
   arrowButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   arrowText: {
     fontSize: 12,
     fontWeight: '700',
-    color: THEME.colors.primaryDark,
+    color: colors.primaryDark,
   },
 });

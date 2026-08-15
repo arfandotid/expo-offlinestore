@@ -21,11 +21,14 @@ import EmptyState from '../../src/components/EmptyState';
 import CategoryFilter from '../../src/components/CategoryFilter';
 import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
+import { useTheme } from '../../src/theme/ThemeProvider';
 import { formatRupiah } from '../../src/components/ProductCard';
 
 export default function SalesScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]); // Array: { product: Object, qty: Number }
@@ -212,9 +215,9 @@ export default function SalesScreen() {
                 hitSlop={8}
               >
                 {searchVisible ? (
-                  <X size={22} color={THEME.colors.text} />
+                  <X size={22} color={colors.text} />
                 ) : (
-                  <Search size={22} color={THEME.colors.text} />
+                  <Search size={22} color={colors.text} />
                 )}
               </TouchableOpacity>
               <TouchableOpacity
@@ -222,7 +225,7 @@ export default function SalesScreen() {
                 style={styles.headerActionBtn}
                 hitSlop={8}
               >
-                <Barcode size={22} color={THEME.colors.text} />
+                <Barcode size={22} color={colors.text} />
               </TouchableOpacity>
             </HeaderActions>
           ),
@@ -234,11 +237,11 @@ export default function SalesScreen() {
         {searchVisible && (
           <View style={styles.searchRow}>
             <View style={styles.searchInputWrapper}>
-              <Search size={15} color={THEME.colors.textMuted} style={styles.searchIcon} />
+              <Search size={15} color={colors.textMuted} style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Cari menu / nama produk..."
-                placeholderTextColor={THEME.colors.textMuted}
+                placeholderTextColor={colors.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 clearButtonMode="while-editing"
@@ -246,7 +249,7 @@ export default function SalesScreen() {
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-                  <X size={14} color={THEME.colors.textMuted} />
+                  <X size={14} color={colors.textMuted} />
                 </TouchableOpacity>
               )}
             </View>
@@ -266,7 +269,7 @@ export default function SalesScreen() {
       {/* Grid Katalog Produk (2 Kolom) */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={THEME.colors.primary} />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>Memuat katalog...</Text>
         </View>
       ) : (
@@ -287,7 +290,7 @@ export default function SalesScreen() {
           ListEmptyComponent={
             <EmptyState
               icon={
-                <Search size={36} color={THEME.colors.primary} />
+                <Search size={36} color={colors.primary} />
               }
               title={
                 selectedCategory && !searchQuery
@@ -366,7 +369,7 @@ export default function SalesScreen() {
                   activeOpacity={0.7}
                   style={styles.closeModalBtn}
                 >
-                  <X size={14} color={THEME.colors.textSecondary} />
+                  <X size={14} color={colors.textSecondary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -385,7 +388,7 @@ export default function SalesScreen() {
               )}
               ListEmptyComponent={
                 <View style={styles.emptyCartBox}>
-                  <ShoppingCart size={48} color={THEME.colors.textMuted} />
+                  <ShoppingCart size={48} color={colors.textMuted} />
                   <Text style={styles.emptyCartText}>Keranjang belanja Anda kosong</Text>
                 </View>
               }
@@ -416,18 +419,18 @@ export default function SalesScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
   },
   headerArea: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     paddingHorizontal: THEME.spacing.lg,
     paddingTop: THEME.spacing.md,
     paddingBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
     ...THEME.shadow.card,
   },
   headerActionBtn: {
@@ -446,19 +449,19 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     borderRadius: THEME.borderRadius.lg,
     paddingHorizontal: THEME.spacing.md,
     paddingVertical: THEME.spacing.sm,
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   searchIcon: {
     marginRight: THEME.spacing.sm,
   },
   searchInput: {
     flex: 1,
-    color: THEME.colors.text,
+    color: colors.text,
     fontSize: 14,
     padding: 0,
   },
@@ -472,7 +475,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 12,
-    color: THEME.colors.textMuted,
+    color: colors.textMuted,
     marginTop: THEME.spacing.sm,
   },
   catalogList: {
@@ -488,7 +491,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: THEME.colors.surface,
+    backgroundColor: colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: '85%',
@@ -501,16 +504,16 @@ const styles = StyleSheet.create({
     paddingTop: THEME.spacing.xl,
     paddingBottom: THEME.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: THEME.colors.borderLight,
+    borderBottomColor: colors.borderLight,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '800',
-    color: THEME.colors.text,
+    color: colors.text,
   },
   modalSubtitle: {
     fontSize: 12,
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     marginTop: 2,
   },
   modalHeaderActions: {
@@ -522,10 +525,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: THEME.colors.dangerLight,
+    backgroundColor: colors.dangerLight,
   },
   clearCartText: {
-    color: THEME.colors.dangerDark,
+    color: colors.dangerDark,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -533,11 +536,11 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: THEME.colors.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: THEME.colors.border,
+    borderColor: colors.border,
   },
   cartItemList: {
     padding: THEME.spacing.lg,
@@ -548,7 +551,7 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
   },
   emptyCartText: {
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -557,8 +560,8 @@ const styles = StyleSheet.create({
     paddingTop: THEME.spacing.md,
     paddingBottom: THEME.spacing.xl,
     borderTopWidth: 1,
-    borderTopColor: THEME.colors.borderLight,
-    backgroundColor: THEME.colors.surface,
+    borderTopColor: colors.borderLight,
+    backgroundColor: colors.surface,
   },
   modalTotalRow: {
     flexDirection: 'row',
@@ -569,18 +572,18 @@ const styles = StyleSheet.create({
   modalTotalLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: THEME.colors.textSecondary,
+    color: colors.textSecondary,
   },
   modalTotalPrice: {
     fontSize: 20,
     fontWeight: '800',
-    color: THEME.colors.primary,
+    color: colors.primary,
   },
   modalCheckoutBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: THEME.colors.primary,
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: THEME.borderRadius.lg,
     ...THEME.shadow.card,
