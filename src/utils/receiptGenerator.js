@@ -4,6 +4,7 @@ import { Platform } from 'react-native';
 import { Directory, File } from 'expo-file-system';
 import { formatRupiah } from '../components/ProductCard';
 import { formatTransactionNo } from './transactionNumber';
+import { settingsRepository } from '../db/settingsRepository';
 
 /**
  * Format tanggal dan waktu untuk struk
@@ -20,9 +21,26 @@ function formatDateTime(isoString) {
 }
 
 /**
+ * Membaca gambar logo menjadi data URI base64 untuk disematkan di HTML struk
+ */
+async function loadLogoDataUri(uri) {
+  if (!uri) return '';
+  try {
+    const file = new File(uri);
+    const base64 = await file.base64();
+    const ext = (file.extension || 'png').replace('.', '').toLowerCase();
+    const mime = ext === 'jpg' ? 'jpeg' : ext;
+    return `data:image/${mime};base64,${base64}`;
+  } catch (error) {
+    console.error('Error loading logo for receipt:', error);
+    return '';
+  }
+}
+
+/**
  * Menghasilkan HTML struk transaksi thermal-style yang rapi
  */
-export function generateReceiptHtml(transaction) {
+export async function generateReceiptHtml(transaction) {
   const {
     items = [],
     totalPrice = 0,
@@ -34,6 +52,16 @@ export function generateReceiptHtml(transaction) {
   } = transaction;
 
   const receiptNo = formatTransactionNo(transaction.id, timestamp);
+
+  const settings = settingsRepository.getSettings();
+  const storeName = settings.app_name || 'POS TOKO OFFLINE';
+  const logoDataUri = await loadLogoDataUri(settings.app_logo_uri);
+
+  const logoHtml = logoDataUri
+    ? `
+            <img src="${logoDataUri}" alt="Logo" style="width: 72px; height: auto; max-height: 72px; object-fit: contain; margin-bottom: 6px;" />
+          `
+    : '';
 
   const itemsHtml = items
     .map((item) => {
@@ -148,7 +176,8 @@ export function generateReceiptHtml(transaction) {
         <div class="receipt-container">
           <!-- Header Toko -->
           <div class="header">
-            <div class="store-name">POS TOKO OFFLINE</div>
+            ${logoHtml}
+            <div class="store-name">${storeName}</div>
             <div class="store-address">Solusi Kasir Praktis & 100% Offline</div>
           </div>
 
@@ -230,7 +259,7 @@ export function generateReceiptHtml(transaction) {
  * Merender struk menjadi file PDF dan menyimpannya di local storage
  */
 export async function createReceiptPdf(transaction) {
-  const html = generateReceiptHtml(transaction);
+  const html = await generateReceiptHtml(transaction);
   const file = await Print.printToFileAsync({
     html,
     width: 595, // Standar print width

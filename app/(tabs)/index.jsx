@@ -19,6 +19,7 @@ import CartItem from '../../src/components/CartItem';
 import CartSummary from '../../src/components/CartSummary';
 import EmptyState from '../../src/components/EmptyState';
 import CategoryFilter from '../../src/components/CategoryFilter';
+import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
 import { formatRupiah } from '../../src/components/ProductCard';
 
@@ -204,7 +205,7 @@ export default function SalesScreen() {
       <Tabs.Screen
         options={{
           headerRight: () => (
-            <View style={styles.headerActions}>
+            <HeaderActions>
               <TouchableOpacity
                 onPress={toggleSearch}
                 style={styles.headerActionBtn}
@@ -223,7 +224,7 @@ export default function SalesScreen() {
               >
                 <Barcode size={22} color={THEME.colors.text} />
               </TouchableOpacity>
-            </View>
+            </HeaderActions>
           ),
         }}
       />
@@ -427,11 +428,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.borderLight,
     ...THEME.shadow.card,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: THEME.spacing.md,
   },
   headerActionBtn: {
     padding: 6,

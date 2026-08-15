@@ -76,12 +76,25 @@ export default function RootLayout() {
             animation: 'fade',
           }}
         />
-        <Stack.Screen
-          name="checkout"
-          options={{
+        <Stack.Screen name="checkout" options={{
             headerShown: true,
             title: 'Pembayaran',
             headerBackTitle: 'Kasir',
+            headerStyle: { backgroundColor: THEME.colors.surface },
+            headerTitleStyle: {
+              fontWeight: '700',
+              fontSize: 17,
+              color: THEME.colors.text,
+            },
+            headerTintColor: THEME.colors.primary,
+          }}
+        />
+        <Stack.Screen
+          name="settings"
+          options={{
+            headerShown: true,
+            title: 'Pengaturan',
+            headerBackTitle: 'Kembali',
             headerStyle: { backgroundColor: THEME.colors.surface },
             headerTitleStyle: {
               fontWeight: '700',

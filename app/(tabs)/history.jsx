@@ -7,11 +7,12 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, Tabs } from 'expo-router';
 import { ScrollText } from 'lucide-react-native';
 import { transactionRepository } from '../../src/db/transactionRepository';
 import TransactionCard from '../../src/components/TransactionCard';
 import EmptyState from '../../src/components/EmptyState';
+import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
 import { formatRupiah } from '../../src/components/ProductCard';
 
@@ -58,6 +59,12 @@ export default function HistoryScreen() {
 
   return (
     <View style={styles.container}>
+      <Tabs.Screen
+        options={{
+          headerRight: () => <HeaderActions />,
+        }}
+      />
+
       {/* Omzet Summary Header Card */}
       <View style={styles.headerCard}>
         <View style={styles.omzetRow}>

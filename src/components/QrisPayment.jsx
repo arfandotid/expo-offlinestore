@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,12 +11,21 @@ import * as ImagePicker from 'expo-image-picker';
 import { Smartphone, Camera, CircleCheck } from 'lucide-react-native';
 import { THEME } from '../constants/theme';
 import { formatRupiah } from './ProductCard';
+import { settingsRepository } from '../db/settingsRepository';
 
 export default function QrisPayment({
   totalPrice,
   proofPhotoUri,
   onSetProofPhoto,
 }) {
+  const [settings, setSettings] = useState(settingsRepository.getSettings());
+
+  useEffect(() => {
+    setSettings(settingsRepository.getSettings());
+  }, []);
+
+  const merchantName = settings.app_name || 'POS TOKO OFFLINE';
+  const qrisUri = settings.qris_uri || null;
   // Ambil foto bukti transfer menggunakan kamera HP
   const handleTakeProofPhoto = async () => {
     try {
@@ -50,19 +59,30 @@ export default function QrisPayment({
       <View style={styles.qrisCard}>
         <View style={styles.qrisHeader}>
           <Text style={styles.qrisLogo}>QRIS</Text>
-          <Text style={styles.qrisMerchant}>POS TOKO OFFLINE</Text>
+          <Text style={styles.qrisMerchant}>{merchantName}</Text>
         </View>
 
-        {/* QR Pattern Placeholder Box */}
-        <View style={styles.qrCodeBox}>
-          <View style={styles.qrCornerTopLeft} />
-          <View style={styles.qrCornerTopRight} />
-          <View style={styles.qrCornerBottomLeft} />
-          
-          <Smartphone size={44} color={THEME.colors.text} style={styles.qrIcon} />
-          <Text style={styles.qrHint}>NMID: ID102003847592</Text>
-          <Text style={styles.qrAmountBadge}>{formatRupiah(totalPrice)}</Text>
-        </View>
+        {/* Gambar QRIS Toko (dari Pengaturan) */}
+        {qrisUri ? (
+          <View style={styles.qrImageBox}>
+            <Image
+              source={{ uri: qrisUri }}
+              style={styles.qrisImage}
+              resizeMode="contain"
+            />
+          </View>
+        ) : (
+          <View style={styles.qrCodeBox}>
+            <View style={styles.qrCornerTopLeft} />
+            <View style={styles.qrCornerTopRight} />
+            <View style={styles.qrCornerBottomLeft} />
+
+            <Smartphone size={44} color={THEME.colors.text} style={styles.qrIcon} />
+            <Text style={styles.qrHint}>NMID: ID102003847592</Text>
+          </View>
+        )}
+
+        <Text style={styles.qrAmountBadge}>{formatRupiah(totalPrice)}</Text>
 
         <Text style={styles.scanInstruction}>
           Minta pelanggan memindai QRIS di atas dengan aplikasi m-Banking atau e-Wallet apapun.
@@ -173,6 +193,18 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginVertical: THEME.spacing.sm,
     padding: THEME.spacing.md,
+  },
+  qrImageBox: {
+    width: 200,
+    height: 200,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginVertical: THEME.spacing.sm,
+  },
+  qrisImage: {
+    width: '100%',
+    height: '100%',
   },
   qrCornerTopLeft: {
     position: 'absolute',

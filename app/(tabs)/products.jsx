@@ -16,6 +16,7 @@ import { productRepository } from '../../src/db/productRepository';
 import ProductCard from '../../src/components/ProductCard';
 import EmptyState from '../../src/components/EmptyState';
 import CategoryFilter from '../../src/components/CategoryFilter';
+import HeaderActions from '../../src/components/HeaderActions';
 import { THEME } from '../../src/constants/theme';
 
 export default function ProductsScreen() {
@@ -123,7 +124,7 @@ export default function ProductsScreen() {
       <Tabs.Screen
         options={{
           headerRight: () => (
-            <View style={styles.headerActions}>
+            <HeaderActions>
               <TouchableOpacity
                 onPress={toggleSearch}
                 style={styles.headerActionBtn}
@@ -135,7 +136,7 @@ export default function ProductsScreen() {
                   <Search size={22} color={THEME.colors.text} />
                 )}
               </TouchableOpacity>
-            </View>
+            </HeaderActions>
           ),
         }}
       />
@@ -267,11 +268,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: THEME.colors.borderLight,
     ...THEME.shadow.card,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: THEME.spacing.md,
   },
   headerActionBtn: {
     padding: 6,

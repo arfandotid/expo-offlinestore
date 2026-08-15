@@ -57,5 +57,13 @@ export function initDatabase() {
     );
   `);
 
-  console.log('[SQLite] Database initialized: `products`, `transactions`, and `transaction_items` ready.');
+  // 4. Tabel pengaturan aplikasi (nama toko, logo struk, QRIS)
+  db.execSync(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    );
+  `);
+
+  console.log('[SQLite] Database initialized: `products`, `transactions`, `transaction_items`, and `settings` ready.');
 }
