@@ -11,7 +11,7 @@ import {
   StyleSheet,
   SafeAreaView,
 } from 'react-native';
-import { useRouter, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { useRouter, useFocusEffect, useLocalSearchParams, Tabs } from 'expo-router';
 import { Search, Barcode, X, ShoppingCart, ArrowRight } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import CatalogCard from '../../src/components/CatalogCard';
@@ -31,6 +31,7 @@ export default function SalesScreen() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchVisible, setSearchVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [cartModalVisible, setCartModalVisible] = useState(false);
 
@@ -174,6 +175,16 @@ export default function SalesScreen() {
     });
   };
 
+  // Toggle bar pencarian dari ikon di navbar
+  const toggleSearch = () => {
+    if (searchVisible) {
+      setSearchQuery('');
+      setSearchVisible(false);
+    } else {
+      setSearchVisible(true);
+    }
+  };
+
   // Navigasi ke Layar Checkout Pembayaran (Fase 4)
   const handleCheckout = () => {
     if (cart.length === 0) return;
@@ -190,36 +201,56 @@ export default function SalesScreen() {
 
   return (
     <View style={styles.container}>
+      <Tabs.Screen
+        options={{
+          headerRight: () => (
+            <View style={styles.headerActions}>
+              <TouchableOpacity
+                onPress={toggleSearch}
+                style={styles.headerActionBtn}
+                hitSlop={8}
+              >
+                {searchVisible ? (
+                  <X size={22} color={THEME.colors.text} />
+                ) : (
+                  <Search size={22} color={THEME.colors.text} />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={openScanner}
+                style={styles.headerActionBtn}
+                hitSlop={8}
+              >
+                <Barcode size={22} color={THEME.colors.text} />
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+
       {/* Header Search & Scanner Bar */}
       <View style={styles.headerArea}>
-        <View style={styles.searchRow}>
-          <View style={styles.searchInputWrapper}>
-            <Search size={15} color={THEME.colors.textMuted} style={styles.searchIcon} />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Cari menu / nama barang..."
-              placeholderTextColor={THEME.colors.textMuted}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              clearButtonMode="while-editing"
-            />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-                <X size={14} color={THEME.colors.textMuted} />
-              </TouchableOpacity>
-            )}
+        {searchVisible && (
+          <View style={styles.searchRow}>
+            <View style={styles.searchInputWrapper}>
+              <Search size={15} color={THEME.colors.textMuted} style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Cari menu / nama barang..."
+                placeholderTextColor={THEME.colors.textMuted}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                clearButtonMode="while-editing"
+                autoFocus
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+                  <X size={14} color={THEME.colors.textMuted} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-
-          {/* Tombol Scan Barcode Kasir */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={openScanner}
-            style={styles.scanBtn}
-          >
-            <Barcode size={14} color={THEME.colors.primaryDark} style={styles.scanBtnIcon} />
-            <Text style={styles.scanBtnText}>Scan</Text>
-          </TouchableOpacity>
-        </View>
+        )}
 
         {/* Filter Kategori */}
         <View style={styles.categoryFilterWrap}>
@@ -397,6 +428,15 @@ const styles = StyleSheet.create({
     borderBottomColor: THEME.colors.borderLight,
     ...THEME.shadow.card,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: THEME.spacing.md,
+  },
+  headerActionBtn: {
+    padding: 6,
+    marginLeft: THEME.spacing.xs,
+  },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -427,25 +467,6 @@ const styles = StyleSheet.create({
   },
   clearBtn: {
     padding: 4,
-  },
-  scanBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: THEME.colors.primarySoft,
-    borderWidth: 1,
-    borderColor: THEME.colors.primaryLight,
-    borderRadius: THEME.borderRadius.lg,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    marginLeft: 8,
-  },
-  scanBtnIcon: {
-    marginRight: 4,
-  },
-  scanBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: THEME.colors.primaryDark,
   },
   loadingContainer: {
     flex: 1,

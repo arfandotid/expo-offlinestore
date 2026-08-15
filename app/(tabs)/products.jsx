@@ -10,7 +10,7 @@ import {
   RefreshControl,
   StyleSheet,
 } from 'react-native';
-import { useRouter, useFocusEffect } from 'expo-router';
+import { useRouter, useFocusEffect, Tabs } from 'expo-router';
 import { Search, X, Plus } from 'lucide-react-native';
 import { productRepository } from '../../src/db/productRepository';
 import ProductCard from '../../src/components/ProductCard';
@@ -24,6 +24,7 @@ export default function ProductsScreen() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchVisible, setSearchVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -70,6 +71,16 @@ export default function ProductsScreen() {
     loadProducts();
   };
 
+  // Toggle bar pencarian dari ikon di navbar
+  const toggleSearch = () => {
+    if (searchVisible) {
+      setSearchQuery('');
+      setSearchVisible(false);
+    } else {
+      setSearchVisible(true);
+    }
+  };
+
   const handleEdit = (product) => {
     router.push({
       pathname: '/products/form',
@@ -109,24 +120,47 @@ export default function ProductsScreen() {
 
   return (
     <View style={styles.container}>
+      <Tabs.Screen
+        options={{
+          headerRight: () => (
+            <View style={styles.headerActions}>
+              <TouchableOpacity
+                onPress={toggleSearch}
+                style={styles.headerActionBtn}
+                hitSlop={8}
+              >
+                {searchVisible ? (
+                  <X size={22} color={THEME.colors.text} />
+                ) : (
+                  <Search size={22} color={THEME.colors.text} />
+                )}
+              </TouchableOpacity>
+            </View>
+          ),
+        }}
+      />
+
       {/* Search Header Bar */}
       <View style={styles.searchHeader}>
-        <View style={styles.searchInputWrapper}>
-          <Search size={16} color={THEME.colors.textMuted} style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Cari nama barang atau barcode..."
-            placeholderTextColor={THEME.colors.textMuted}
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-            clearButtonMode="while-editing"
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
-              <X size={14} color={THEME.colors.textMuted} />
-            </TouchableOpacity>
-          )}
-        </View>
+        {searchVisible && (
+          <View style={styles.searchInputWrapper}>
+            <Search size={16} color={THEME.colors.textMuted} style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Cari nama barang atau barcode..."
+              placeholderTextColor={THEME.colors.textMuted}
+              value={searchQuery}
+              onChangeText={(text) => setSearchQuery(text)}
+              clearButtonMode="while-editing"
+              autoFocus
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} style={styles.clearBtn}>
+                <X size={14} color={THEME.colors.textMuted} />
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
 
         {/* Filter Kategori */}
         <View style={styles.categoryFilterWrap}>
@@ -135,17 +169,6 @@ export default function ProductsScreen() {
             selected={selectedCategory}
             onSelect={setSelectedCategory}
           />
-        </View>
-
-        {/* Counter Info Bar */}
-        <View style={styles.counterRow}>
-          <Text style={styles.counterText}>
-            Total {products.length} barang terdaftar
-          </Text>
-          <View style={styles.statusIndicator}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Offline SQLite</Text>
-          </View>
         </View>
       </View>
 
@@ -245,6 +268,14 @@ const styles = StyleSheet.create({
     borderBottomColor: THEME.colors.borderLight,
     ...THEME.shadow.card,
   },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginRight: THEME.spacing.md,
+  },
+  headerActionBtn: {
+    padding: 6,
+  },
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -270,33 +301,6 @@ const styles = StyleSheet.create({
   categoryFilterWrap: {
     marginTop: THEME.spacing.md,
     marginHorizontal: -THEME.spacing.lg,
-  },
-  counterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: THEME.spacing.md,
-  },
-  counterText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: THEME.colors.textSecondary,
-  },
-  statusIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: THEME.colors.primary,
-    marginRight: 6,
-  },
-  statusText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: THEME.colors.primaryDark,
   },
   loadingContainer: {
     flex: 1,
