@@ -49,8 +49,8 @@ export default function CatalogCard({ product, onAddToCart, cartQty = 0 }) {
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    margin: 6,
+    width: '48%',
+    marginVertical: 6,
     backgroundColor: THEME.colors.surface,
     borderRadius: THEME.borderRadius.lg,
     overflow: 'hidden',

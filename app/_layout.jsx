@@ -72,8 +72,6 @@ export default function RootLayout() {
           name="products/scanner"
           options={{
             headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'fade',
           }}
         />
         <Stack.Screen name="checkout" options={{

@@ -274,6 +274,7 @@ export default function SalesScreen() {
           data={products}
           keyExtractor={(item) => item.id.toString()}
           numColumns={2}
+          columnWrapperStyle={styles.catalogRow}
           contentContainerStyle={styles.catalogList}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
@@ -477,6 +478,9 @@ const styles = StyleSheet.create({
   catalogList: {
     padding: THEME.spacing.sm,
     paddingBottom: 100,
+  },
+  catalogRow: {
+    justifyContent: 'space-between',
   },
   modalBackdrop: {
     flex: 1,

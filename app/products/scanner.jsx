@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -11,6 +11,14 @@ export default function BarcodeScannerScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [torch, setTorch] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [cameraKey, setCameraKey] = useState(0);
+  const remounted = useRef(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 250);
+    return () => clearTimeout(t);
+  }, []);
 
   // Jika izin belum siap
   if (!permission) {
@@ -61,27 +69,28 @@ export default function BarcodeScannerScreen() {
     }
   };
 
+  const handleCameraReady = () => {
+    if (!remounted.current) {
+      remounted.current = true;
+      setCameraKey((k) => k + 1);
+    }
+  };
+
   return (
     <View style={styles.container}>
-      <CameraView
-        style={StyleSheet.absoluteFillObject}
-        facing="back"
-        enableTorch={torch}
-        barcodeScannerSettings={{
-          barcodeTypes: [
-            'qr',
-            'ean13',
-            'ean8',
-            'code128',
-            'code39',
-            'upc_a',
-            'upc_e',
-            'itf14',
-            'datamatrix',
-          ],
-        }}
-        onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
-      />
+      {ready && (
+        <CameraView
+          key={cameraKey}
+          style={StyleSheet.absoluteFillObject}
+          facing="back"
+          enableTorch={torch}
+          barcodeScannerSettings={{
+            barcodeTypes: ['qr', 'ean13'],
+          }}
+          onCameraReady={handleCameraReady}
+          onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
+        />
+      )}
 
       {/* Overlay Mask */}
       <View style={styles.overlay}>
